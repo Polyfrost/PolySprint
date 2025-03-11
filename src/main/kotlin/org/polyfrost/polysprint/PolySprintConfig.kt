@@ -18,6 +18,7 @@
 
 package org.polyfrost.polysprint
 
+import dev.deftu.omnicore.client.OmniKeyboard
 import org.polyfrost.oneconfig.api.config.v1.Config
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind
@@ -25,7 +26,6 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.registerKeybind
 import org.polyfrost.polyui.input.KeybindHelper
-import org.polyfrost.universal.UKeyboard
 
 object PolySprintConfig : Config(
     //VigilanceMigrator(File("./config/simpletogglesprint.toml").absolutePath),
@@ -63,7 +63,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sprint Keybind",
         subcategory = "Toggle Sprint"
     )
-    var keybindToggleSprintKey = KeybindHelper.builder().keys(UKeyboard.KEY_NONE).does {
+    var keybindToggleSprintKey = KeybindHelper.builder().keys(OmniKeyboard.KEY_NONE).does {
         if (keybindToggleSprint) {
             if (enabled && toggleSprint && !PolySprint.sprintHeld) {
                 toggleSprintState = !toggleSprintState
@@ -84,7 +84,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sneak Keybind",
         subcategory = "Toggle Sneak"
     )
-    var keybindToggleSneakKey = KeybindHelper.builder().keys(UKeyboard.KEY_NONE).does {
+    var keybindToggleSneakKey = KeybindHelper.builder().keys(OmniKeyboard.KEY_NONE).does {
         if (keybindToggleSneak) {
             if (enabled && toggleSneak && !PolySprint.sneakHeld) {
                 toggleSneakState = !toggleSneakState

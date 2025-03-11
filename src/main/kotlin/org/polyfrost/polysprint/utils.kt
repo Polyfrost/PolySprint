@@ -18,26 +18,27 @@
 
 package org.polyfrost.polysprint
 
+import dev.deftu.omnicore.client.*
 import net.minecraft.client.settings.KeyBinding
-import org.lwjgl.input.Mouse
 import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils
-import org.polyfrost.polysprint.PolySprint.gameSettings
-import org.polyfrost.polysprint.PolySprint.player
-import org.polyfrost.universal.UKeyboard
-import org.polyfrost.universal.UScreen
 
 fun shouldSetSprint(keyBinding: KeyBinding): Boolean {
-    return keyBinding.isKeyDown || UScreen.currentScreen == null && PolySprintConfig.enabled && PolySprintConfig.toggleSprint && PolySprintConfig.toggleSprintState
+    return keyBinding.isKeyDown || !OmniScreen.isInScreen && PolySprintConfig.enabled && PolySprintConfig.toggleSprint && PolySprintConfig.toggleSprintState
 }
 
 fun shouldSetSneak(keyBinding: KeyBinding): Boolean {
-    return keyBinding.isKeyDown || UScreen.currentScreen == null && PolySprintConfig.enabled && PolySprintConfig.toggleSneak && PolySprintConfig.toggleSneakState
+    return keyBinding.isKeyDown || !OmniScreen.isInScreen && PolySprintConfig.enabled && PolySprintConfig.toggleSneak && PolySprintConfig.toggleSneakState
 }
 
 fun shouldFlyBoost(): Boolean {
-    return gameSettings.keyBindSprint.isKeyDown && PolySprintConfig.enabled && PolySprintConfig.toggleFlyBoost && player!!.capabilities.isFlying && player!!.capabilities.isCreativeMode && !HypixelUtils.isHypixel()
+    val player = OmniClientPlayer.getInstance() ?: return false
+    return OmniClient.getInstance().gameSettings.keyBindSprint.isKeyDown && PolySprintConfig.enabled && PolySprintConfig.toggleFlyBoost && player.capabilities.isFlying && player.capabilities.isCreativeMode && !HypixelUtils.isHypixel()
 }
 
-fun checkKeyCode(keyCode: Int) = if (keyCode > 0) UKeyboard.isKeyDown(keyCode) else Mouse.isButtonDown(
-    keyCode + 100
-)
+fun checkKeyCode(keyCode: Int): Boolean {
+    return if (keyCode > 0) {
+        OmniKeyboard.isPressed(keyCode)
+    } else {
+        OmniMouse.isPressed(keyCode + 100)
+    }
+}

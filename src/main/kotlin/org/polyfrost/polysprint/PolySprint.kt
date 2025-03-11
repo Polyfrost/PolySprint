@@ -29,9 +29,9 @@ import net.minecraftforge.fml.common.gameevent.InputEvent
 //$$ import net.legacyfabric.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 //#endif
 
+import dev.deftu.omnicore.client.OmniClient
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
-import org.polyfrost.universal.UMinecraft
 
 //#if FORGE
 @Mod(modid = PolySprint.ID, version = PolySprint.VERSION, name = PolySprint.NAME, modLanguageAdapter = "org.polyfrost.oneconfig.utils.v1.forge.KotlinLanguageAdapter")
@@ -45,10 +45,6 @@ object PolySprint
     const val ID = "@MOD_ID@"
     const val NAME = "@MOD_NAME@"
     const val VERSION = "@MOD_VERSION@"
-    val player
-        get() = UMinecraft.getPlayer()
-    val gameSettings
-        get() = UMinecraft.getSettings()
 
     var sprintHeld = false
     var sneakHeld = false
@@ -59,7 +55,7 @@ object PolySprint
 
     private fun postInitialize() {
         HudManager.register(PolySprintHud())
-        CommandManager.registerCommand(PolySprintCommand())
+        CommandManager.register(PolySprintCommand())
     }
 
     private fun handleInput() {
@@ -67,8 +63,9 @@ object PolySprint
             return
         }
 
-        val sprint = gameSettings.keyBindSprint.keyCode
-        val sneak = gameSettings.keyBindSneak.keyCode
+        val options = OmniClient.getInstance().gameSettings
+        val sprint = options.keyBindSprint.keyCode
+        val sneak = options.keyBindSneak.keyCode
 
         if (!PolySprintConfig.keybindToggleSprint && checkKeyCode(sprint)) {
             if (PolySprintConfig.enabled && PolySprintConfig.toggleSprint && !sprintHeld) {
