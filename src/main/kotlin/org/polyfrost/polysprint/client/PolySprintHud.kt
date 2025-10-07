@@ -16,17 +16,21 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint
+package org.polyfrost.polysprint.client
 
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.TextHud
-import org.polyfrost.polysprint.PolySprint
 import org.polyfrost.polyui.unit.fix
 
-class PolySprintHud : TextHud("") {
+class PolySprintHud : TextHud(
+    id = "togglesprint.json",
+    title = "PolySprint State",
+    category = Category.PLAYER,
+    prefix = ""
+) {
     private var isSneaking = false
     private var isFlying = false
     private var isSprinting = false
@@ -39,7 +43,7 @@ class PolySprintHud : TextHud("") {
         title = "Reset Text on ALL HUDs",
         text = "Reset"
     )
-    var resetText = Runnable {
+    fun resetText() {
         descendingHeld = "Descending (key held)"
         descendingToggled = "Descending (toggled)"
         descending = "Descending (vanilla)"
@@ -138,49 +142,79 @@ class PolySprintHud : TextHud("") {
     )
     var sprint = "Sprinting (vanilla)"
 
-    override fun initialize() {
-        eventHandler { _: SneakStart -> isSneaking = true; updateAndRecalculate() }.register()
-        eventHandler { _: SneakEnd -> isSneaking = false; updateAndRecalculate() }.register()
-        eventHandler { _: FlyStart -> isFlying = true; updateAndRecalculate() }.register()
-        eventHandler { _: FlyEnd -> isFlying = false; updateAndRecalculate() }.register()
-        eventHandler { _: RideStart -> isRiding = true; updateAndRecalculate() }.register()
-        eventHandler { _: RideEnd -> isRiding = false; updateAndRecalculate() }.register()
-        eventHandler { _: SprintStart -> isSprinting = true; updateAndRecalculate() }.register()
-        eventHandler { _: SprintEnd -> isSprinting = false; updateAndRecalculate() }.register()
+    override fun setup() {
+        super.setup()
+
+        eventHandler { event: SprintStateEvent.Start ->
+            when (event.type) {
+                SprintStateEvent.Type.SNEAK -> isSneaking = true
+                SprintStateEvent.Type.FLY -> isFlying = true
+                SprintStateEvent.Type.RIDE -> isRiding = true
+                SprintStateEvent.Type.SPRINT -> isSprinting = true
+            }
+
+            updateAndRecalculate()
+        }.register()
+
+        eventHandler { event: SprintStateEvent.End ->
+            when (event.type) {
+                SprintStateEvent.Type.SNEAK -> isSneaking = false
+                SprintStateEvent.Type.FLY -> isFlying = false
+                SprintStateEvent.Type.RIDE -> isRiding = false
+                SprintStateEvent.Type.SPRINT -> isSprinting = false
+            }
+
+            updateAndRecalculate()
+        }.register()
     }
 
     override fun getText(): String? {
-        if (brackets) sb.append('[')
+        if (brackets) {
+            sb.append('[')
+        }
+
         val config = PolySprintConfig
         if (isFlying) {
             if (isSneaking) {
-                if (PolySprint.sneakHeld) sb.append(descendingHeld)
-                else if (config.enabled && config.toggleSprint && config.toggleSneakState) sb.append(descendingToggled)
-                else sb.append(descending)
+                if (PolySprintClient.isSneakHeld) {
+                    sb.append(descendingHeld)
+                } else if (config.isEnabled && isToggleSprintEnabled && config.toggleSneakState) {
+                    sb.append(descendingToggled)
+                } else {
+                    sb.append(descending)
+                }
             } else {
                 sb.append(flying)
-                if (shouldFlyBoost()) {
+                if (isFlyBoosting()) {
                     sb.append(' ').append(config.flyBoostAmount.fix(2)).append(flyBoostText)
                 }
             }
-        } else if (isRiding) sb.append(riding)
-        else if (isSneaking) {
-            if (PolySprint.sneakHeld) sb.append(sneakHeld)
-            else if (config.enabled && config.toggleSneak && config.toggleSneakState) sb.append(sneakToggle)
-            else sb.append(sneak)
+        } else if (isRiding) {
+            sb.append(riding)
+        } else if (isSneaking) {
+            if (PolySprintClient.isSneakHeld) {
+                sb.append(sneakHeld)
+            } else if (config.isEnabled && isToggleSneakEnabled && config.toggleSneakState) {
+                sb.append(sneakToggle)
+            } else {
+                sb.append(sneak)
+            }
         } else if (isSprinting) {
-            if (PolySprint.sprintHeld) sb.append(sprintHeld)
-            else if (config.enabled && config.toggleSprint && config.toggleSprintState) sb.append(sprintToggle)
-            else sb.append(sprint)
+            if (PolySprintClient.isSprintHeld) {
+                sb.append(sprintHeld)
+            } else if (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState) {
+                sb.append(sprintToggle)
+            } else {
+                sb.append(sprint)
+            }
         }
-        if (brackets) sb.append(']')
-        hidden = sb.isEmpty() || (brackets && sb.length == 2)
+
+        if (brackets) {
+            sb.append(']')
+        }
+
+//        hidden = sb.isEmpty() || (brackets && sb.length == 2)
+
         return null
     }
-
-    override fun id() = "togglesprint.json"
-
-    override fun category() = Category.PLAYER
-
-    override fun title() = "Toggle Sprint"
 }

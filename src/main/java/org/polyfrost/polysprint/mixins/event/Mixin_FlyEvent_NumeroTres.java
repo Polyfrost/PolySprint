@@ -16,33 +16,33 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint.mixins;
+package org.polyfrost.polysprint.mixins.event;
 
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.PlayerCapabilities;
-import net.minecraft.world.WorldSettings;
+import org.objectweb.asm.Opcodes;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.Event;
-import org.polyfrost.polysprint.FlyEnd;
-import org.polyfrost.polysprint.FlyStart;
-import org.polyfrost.polysprint.PolySprint;
+import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(WorldSettings.GameType.class)
-public abstract class WorldSettingsMixin {
-
-    @Redirect(method = "configurePlayerCapabilities", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerCapabilities;isFlying:Z"))
+@Mixin(EntityPlayerSP.class)
+public class Mixin_FlyEvent_NumeroTres {
+    @Redirect(
+            method = "onLivingUpdate",
+            at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerCapabilities;isFlying:Z", opcode = Opcodes.PUTFIELD)
+    )
     private void onSetFlying(PlayerCapabilities instance, boolean state) {
         instance.isFlying = state;
-        Event ev;
+        Event event;
         if (state) {
-            ev = FlyStart.INSTANCE;
+            event = new SprintStateEvent.Start(SprintStateEvent.Type.FLY);
         } else {
-            ev = FlyEnd.INSTANCE;
+            event = new SprintStateEvent.End(SprintStateEvent.Type.FLY);
         }
 
-        EventManager.INSTANCE.post(ev);
+        EventManager.INSTANCE.post(event);
     }
-
 }

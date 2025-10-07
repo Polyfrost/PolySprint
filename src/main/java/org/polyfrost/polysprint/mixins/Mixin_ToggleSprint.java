@@ -18,31 +18,23 @@
 
 package org.polyfrost.polysprint.mixins;
 
-import net.minecraft.client.network.NetHandlerPlayClient;
-import net.minecraft.entity.player.PlayerCapabilities;
-import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.Event;
-import org.polyfrost.polysprint.FlyEnd;
-import org.polyfrost.polysprint.FlyStart;
-import org.polyfrost.polysprint.PolySprint;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.settings.KeyBinding;
+import org.polyfrost.polysprint.client.SprintState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(NetHandlerPlayClient.class)
-public abstract class NetHandlerPlayClientMixin {
-
-    @Redirect(method = "handlePlayerAbilities", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerCapabilities;isFlying:Z"))
-    private void onSetFlying(PlayerCapabilities instance, boolean state) {
-        instance.isFlying = state;
-        Event ev;
-        if (state) {
-            ev = FlyStart.INSTANCE;
-        } else {
-            ev = FlyEnd.INSTANCE;
-        }
-
-        EventManager.INSTANCE.post(ev);
+@Mixin(EntityPlayerSP.class)
+public class Mixin_ToggleSprint {
+    @Redirect(
+            method = "onLivingUpdate",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z"
+            )
+    )
+    private boolean setSprintState(KeyBinding keyBinding) {
+        return SprintState.isSprintingToggled(keyBinding);
     }
-
 }

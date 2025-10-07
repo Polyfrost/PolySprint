@@ -16,32 +16,40 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint
+package org.polyfrost.polysprint.client
 
-import dev.deftu.omnicore.client.OmniKeyboard
+import dev.deftu.omnicore.api.client.input.OmniKeys
 import org.polyfrost.oneconfig.api.config.v1.Config
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
-import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager.registerKeybind
+import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.polyui.input.KeybindHelper
+
+//#if MC >= 1.16.5
+//$$ import dev.deftu.omnicore.api.client.client
+//#endif
 
 object PolySprintConfig : Config(
     //VigilanceMigrator(File("./config/simpletogglesprint.toml").absolutePath),
     "polysprint.json",
-    "/polysprint_dark.svg",
+    "/assets/polysprint/polysprint_dark.svg",
     "PolySprint",
     Category.COMBAT
 ) {
+    @JvmStatic @Switch(title = "Enabled")
+    var isEnabled = true
 
+    //#if MC <= 1.12.2
     @Switch(title = "Toggle Sprint")
     var toggleSprint = true
 
     @Switch(title = "Toggle Sneak")
     var toggleSneak = false
+    //#endif
 
-    @Switch(title = "Disable W-Tap Sprint")
+    @JvmStatic @Switch(title = "Disable W-Tap Sprint")
     var disableWTapSprint = true
 
     @JvmField
@@ -63,13 +71,13 @@ object PolySprintConfig : Config(
         title = "Toggle Sprint Keybind",
         subcategory = "Toggle Sprint"
     )
-    var keybindToggleSprintKey = KeybindHelper.builder().keys(OmniKeyboard.KEY_NONE).does {
+    var keybindToggleSprintKey = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.code).does {
         if (keybindToggleSprint) {
-            if (enabled && toggleSprint && !PolySprint.sprintHeld) {
-                toggleSprintState = !toggleSprintState
-                PolySprintConfig.save()
+            if (isEnabled && isToggleSprintEnabled && !PolySprintClient.isSprintHeld) {
+                invertToggleSprintState()
             }
-            PolySprint.sprintHeld = !PolySprint.sprintHeld
+
+            PolySprintClient.invertSprintHeld()
         }
     }.build()
 
@@ -84,13 +92,13 @@ object PolySprintConfig : Config(
         title = "Toggle Sneak Keybind",
         subcategory = "Toggle Sneak"
     )
-    var keybindToggleSneakKey = KeybindHelper.builder().keys(OmniKeyboard.KEY_NONE).does {
+    var keybindToggleSneakKey = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.code).does {
         if (keybindToggleSneak) {
-            if (enabled && toggleSneak && !PolySprint.sneakHeld) {
-                toggleSneakState = !toggleSneakState
-                PolySprintConfig.save()
+            if (isEnabled && isToggleSneakEnabled && !PolySprintClient.isSneakHeld) {
+                invertToggleSneakState()
             }
-            PolySprint.sneakHeld = !PolySprint.sneakHeld
+
+            PolySprintClient.invertSneakHeld()
         }
     }.build()
 
@@ -100,7 +108,7 @@ object PolySprintConfig : Config(
     )
     var toggleFlyBoost = false
 
-    @Slider(
+    @JvmStatic @Slider(
         title = "Fly Boost Amount",
         subcategory = "Fly Boost",
         min = 1.0F,
@@ -109,13 +117,34 @@ object PolySprintConfig : Config(
     var flyBoostAmount = 4.0F
 
     init {
+        //#if MC >= 1.16.5
+        //$$ addDependency("keybindToggleSprint", null) { if (isToggleSprintEnabled) Property.Display.SHOWN else Property.Display.DISABLED }
+        //$$ addDependency("keybindToggleSneak", null) { if (isToggleSneakEnabled) Property.Display.SHOWN else Property.Display.DISABLED }
+        //#else
         addDependency("keybindToggleSprint", "toggleSprint")
         addDependency("keybindToggleSneak", "toggleSneak")
+        //#endif
         addDependency("flyBoostAmount", "toggleFlyBoost")
         addDependency("keybindToggleSprintKey", "keybindToggleSprint")
         addDependency("keybindToggleSneakKey", "keybindToggleSneak")
 
-        registerKeybind(keybindToggleSprintKey)
-        registerKeybind(keybindToggleSneakKey)
+        KeybindManager.registerKeybind(keybindToggleSprintKey)
+        KeybindManager.registerKeybind(keybindToggleSneakKey)
+    }
+
+    fun invertToggleSprintState() {
+        toggleSprintState = !toggleSprintState
+        //#if MC >= 1.16.5
+        //$$ (client.options.keySprint as StickyKeyBindingSetter).toggle(PolySprintConfig.toggleSprintState)
+        //#endif
+        save()
+    }
+
+    fun invertToggleSneakState() {
+        toggleSneakState = !toggleSneakState
+        //#if MC >= 1.16.5
+        //$$ (client.options.keyShift as StickyKeyBindingSetter).toggle(PolySprintConfig.toggleSneakState)
+        //#endif
+        save()
     }
 }

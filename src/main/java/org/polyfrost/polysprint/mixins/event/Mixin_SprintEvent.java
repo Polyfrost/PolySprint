@@ -16,26 +16,22 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint.mixins;
+package org.polyfrost.polysprint.mixins.event;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovementInput;
 import net.minecraft.util.MovementInputFromOptions;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.Event;
-import org.polyfrost.polysprint.SneakEnd;
-import org.polyfrost.polysprint.SneakStart;
-import org.polyfrost.polysprint.UtilsKt;
+import org.polyfrost.polysprint.client.SprintState;
+import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(MovementInputFromOptions.class)
-public abstract class MovementInputFromOptionsMixin extends MovementInput {
-
-    @Unique
-    private boolean polysprint$sneaking = false;
+public abstract class Mixin_SprintEvent extends MovementInput {
+    @Unique private boolean polysprint$sneaking = false;
 
     @Redirect(
             method = "updatePlayerMoveState",
@@ -46,20 +42,13 @@ public abstract class MovementInputFromOptionsMixin extends MovementInput {
             )
     )
     private boolean setSneakState(KeyBinding keyBinding) {
-        boolean state = UtilsKt.shouldSetSneak(keyBinding);
+        boolean state = SprintState.isSneakingToggled(keyBinding);
         if (state != polysprint$sneaking) {
             polysprint$sneaking = state;
-            Event ev;
-            if (state) {
-                ev = SneakStart.INSTANCE;
-            } else {
-                ev = SneakEnd.INSTANCE;
-            }
-
-            EventManager.INSTANCE.post(ev);
+            SprintStateEvent.Type type = SprintStateEvent.Type.SNEAK;
+            EventManager.INSTANCE.post(state ? new SprintStateEvent.Start(type) : new SprintStateEvent.End(type));
         }
 
         return state;
     }
-
 }

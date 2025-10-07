@@ -16,22 +16,18 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint
+package org.polyfrost.polysprint.client
 
 import org.polyfrost.oneconfig.api.event.v1.events.Event
 
-object SprintStart : Event
+sealed interface SprintStateEvent : Event {
+    data class Start(val type: Type) : SprintStateEvent
+    data class End(val type: Type) : SprintStateEvent
 
-object SprintEnd : Event
-
-object RideStart : Event
-
-object RideEnd : Event
-
-object SneakStart : Event
-
-object SneakEnd : Event
-
-object FlyStart : Event
-
-object FlyEnd : Event
+    enum class Type {
+        SPRINT,
+        RIDE,
+        SNEAK,
+        FLY
+    }
+}

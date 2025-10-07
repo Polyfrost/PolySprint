@@ -16,37 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint.mixins.playerapi;
+package org.polyfrost.polysprint.mixins;
 
-import com.mojang.authlib.GameProfile;
-import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.world.World;
-import org.polyfrost.polysprint.UtilsKt;
-import org.spongepowered.asm.mixin.Dynamic;
+import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayerSP.class)
-public abstract class ClientPlayerAPIMixin extends AbstractClientPlayer {
+public abstract class Mixin_DisableWTap {
+    @Shadow protected int sprintToggleTimer;
 
-    public ClientPlayerAPIMixin(World worldIn, GameProfile playerProfile) {
-        super(worldIn, playerProfile);
+    @Inject(method = "onLivingUpdate", at = @At("HEAD"))
+    private void polysprint$disableDoubleTap(CallbackInfo ci) {
+        if (PolySprintConfig.isEnabled() && PolySprintConfig.getDisableWTapSprint()) {
+            this.sprintToggleTimer = 0;
+        }
     }
-
-    @Dynamic
-    @Redirect(
-            method = "localOnLivingUpdate",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z"
-            ),
-            remap = false
-    )
-    private boolean setSprintState(KeyBinding keyBinding) {
-        return UtilsKt.shouldSetSprint(keyBinding);
-    }
-
 }

@@ -16,7 +16,7 @@
         "client": [
             {
                 "adapter": "kotlin",
-                "value": "org.polyfrost.polysprint.PolySprint"
+                "value": "org.polyfrost.polysprint.PolySprintEntrypoint"
             }
         ]
     },
