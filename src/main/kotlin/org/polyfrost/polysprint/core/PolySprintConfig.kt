@@ -21,6 +21,7 @@ package org.polyfrost.polysprint.core
 import cc.polyfrost.oneconfig.config.Config
 import cc.polyfrost.oneconfig.config.annotations.*
 import cc.polyfrost.oneconfig.config.core.OneKeyBind
+import cc.polyfrost.oneconfig.config.data.InfoType
 import cc.polyfrost.oneconfig.config.data.Mod
 import cc.polyfrost.oneconfig.config.data.ModType
 import cc.polyfrost.oneconfig.config.migration.VigilanceMigrator
@@ -93,6 +94,14 @@ object PolySprintConfig : Config(
         subcategory = "Toggle Sneak"
     )
     var keybindToggleSneakKey = OneKeyBind(UKeyboard.KEY_NONE)
+
+    @Info(
+        text = "Warning: Some servers may determine this to be a cheat and ban you for it. Use at your own risk",
+        subcategory = "Fly Boost",
+        type = InfoType.ERROR,
+        size = 2
+    )
+    var ignored = false
 
     @Switch(
         name = "Fly Boost",
