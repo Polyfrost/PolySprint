@@ -19,10 +19,10 @@
 package org.polyfrost.polysprint.mixins;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.client.network.AbstractClientPlayerEntity;
-import net.minecraft.client.input.Input;
-import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.polyfrost.polysprint.client.SprintState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,26 +31,26 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientPlayerEntity.class)
-public abstract class Mixin_SetFlyBoost extends AbstractClientPlayerEntity {
+@Mixin(LocalPlayer.class)
+public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
     @Shadow public Input input;
 
-    public Mixin_SetFlyBoost(ClientWorld level, GameProfile profile) {
+    public Mixin_SetFlyBoost(ClientLevel level, GameProfile profile) {
         super(level, profile);
     }
 
-    @Inject(method = "tickMovement", at = @At("HEAD"))
+    @Inject(method = "aiStep", at = @At("HEAD"))
     private void polysprint$modifyFlightSpeed(CallbackInfo ci) {
         if (!SprintState.isFlyBoosting()) {
-            this.getAbilities().setFlySpeed(0.05f);
+            this.getAbilities().setFlyingSpeed(0.05f);
             return;
         }
 
         float boost = PolySprintConfig.getFlyBoostAmount();
-        this.getAbilities().setFlySpeed(0.05f * boost);
+        this.getAbilities().setFlyingSpeed(0.05f * boost);
         if (this.getAbilities().flying) {
             double yDelta = 0.0;
-            if (this.input.sneaking) {
+            if (this.input.shiftKeyDown) {
                 yDelta -= 0.15 * boost;
             }
 
@@ -59,7 +59,7 @@ public abstract class Mixin_SetFlyBoost extends AbstractClientPlayerEntity {
             }
 
             if (yDelta != 0.0) {
-                this.setVelocity(this.getVelocity().add(0.0D, yDelta, 0.0D));
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, yDelta, 0.0D));
             }
         }
     }

@@ -18,9 +18,8 @@
 
 package org.polyfrost.polysprint.mixins.event;
 
-import net.minecraft.entity.player.PlayerAbilities;
-import net.minecraft.world.GameMode;
-import net.minecraft.world.level.LevelInfo;
+import net.minecraft.entity.player.PlayerCapabilities;
+import net.minecraft.world.GameType;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.Event;
 import org.polyfrost.polysprint.client.SprintStateEvent;
@@ -28,11 +27,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(GameMode.class)
+@Mixin(GameType.class)
 public abstract class Mixin_FlyEvent_2EletricBoogaloo {
-    @Redirect(method = "gameModeAbilities", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerAbilities;flying:Z"))
-    private void onSetFlying(PlayerAbilities instance, boolean state) {
-        instance.flying = state;
+    @Redirect(method = "configurePlayerCapabilities", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerCapabilities;isFlying:Z"))
+    private void onSetFlying(PlayerCapabilities instance, boolean state) {
+        instance.isFlying = state;
         Event event;
         if (state) {
             event = new SprintStateEvent.Start(SprintStateEvent.Type.FLY);

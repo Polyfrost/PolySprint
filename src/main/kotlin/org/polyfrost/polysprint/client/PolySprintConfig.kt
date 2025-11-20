@@ -29,6 +29,7 @@ import org.polyfrost.polyui.input.KeybindHelper
 
 //#if MC >= 1.16.5
 //$$ import dev.deftu.omnicore.api.client.client
+//$$ import org.polyfrost.oneconfig.api.config.v1.Property
 //#endif
 
 object PolySprintConfig : Config(

@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public abstract class Mixin_RideEvent {
-    @Inject(method = "startRiding", at = @At("HEAD"))
+    @Inject(method = "startRiding(Lnet/minecraft/entity/Entity;Z)Z", at = @At("HEAD"))
     private void onMount(Entity entityIn, boolean force, CallbackInfoReturnable<Boolean> cir) {
         //noinspection ConstantConditions
         if ((Object) this == OmniClient.getPlayer()) {
@@ -38,7 +38,7 @@ public abstract class Mixin_RideEvent {
         }
     }
 
-    @Inject(method = "stopRiding", at = @At("HEAD"))
+    @Inject(method = "dismountRidingEntity", at = @At("HEAD"))
     private void onDismount(CallbackInfo ci) {
         //noinspection ConstantConditions
         if ((Object) this == OmniClient.getPlayer()) {
