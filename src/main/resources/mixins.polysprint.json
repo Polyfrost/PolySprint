@@ -1,8 +1,6 @@
 {
     "compatibilityLevel": "JAVA_8",
     "package": "org.polyfrost.polysprint.mixins",
-    "plugin": "org.polyfrost.polysprint.PolySprintMixinPlugin",
-    "refmap": "mixins.polysprint.refmap.json",
     "verbose": true,
     "client": [
         "event.Mixin_FlyEvent",
@@ -11,9 +9,6 @@
         "event.Mixin_RideEvent",
         "event.Mixin_SprintEvent",
         "event.Mixin_SprintEvent_2EletricBoogaloo",
-
-        "playerapi.Mixin_ToggleSprintPlayerAPI",
-
         "Mixin_DisableWTap",
         "Mixin_SetFlyBoost",
         "Mixin_StickyKeyBindingSetter",

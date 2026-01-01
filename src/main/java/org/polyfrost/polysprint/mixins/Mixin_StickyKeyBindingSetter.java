@@ -18,4 +18,36 @@
 
 package org.polyfrost.polysprint.mixins;
 
-// no-op below 1.16.5
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.ToggleKeyMapping;
+import org.polyfrost.polysprint.client.StickyKeyBindingSetter;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(ToggleKeyMapping.class)
+public abstract class Mixin_StickyKeyBindingSetter extends KeyMapping implements StickyKeyBindingSetter {
+    @Unique private boolean polysprint$consumedForceToggle = false;
+
+    public Mixin_StickyKeyBindingSetter(String string, int i, String string2) {
+        super(string, i, string2);
+    }
+
+    @Override
+    public void polySprint$toggle(boolean value) {
+        this.polysprint$consumedForceToggle = false;
+        super.setDown(value);
+    }
+
+    @Inject(method = "setDown", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;setDown(Z)V", ordinal = 0), cancellable = true)
+    private void onSetDown(boolean bl, CallbackInfo ci) {
+        if (this.polysprint$consumedForceToggle) {
+            return;
+        }
+
+        this.polysprint$consumedForceToggle = true;
+        ci.cancel();
+    }
+}

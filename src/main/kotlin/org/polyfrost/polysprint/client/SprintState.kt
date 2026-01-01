@@ -23,59 +23,50 @@ package org.polyfrost.polysprint.client
 import dev.deftu.omnicore.api.client.input.keybindings.OmniKeyBindings
 import dev.deftu.omnicore.api.client.player
 import dev.deftu.omnicore.api.client.screen.isInScreen
-import net.minecraft.client.settings.KeyBinding
-
-//#if MC >= 1.16.5
-//$$ import dev.deftu.omnicore.api.client.client
-//$$ import dev.deftu.omnicore.api.client.options.OmniKeyboardSettings
-//#endif
+import dev.deftu.omnicore.api.client.client
+import dev.deftu.omnicore.api.client.options.OmniKeyboardSettings
+import net.minecraft.client.KeyMapping
 
 val isToggleSprintEnabled: Boolean
     get() {
-        //#if MC >= 1.16.5
-        //$$ if (client.options == null) {
-        //$$     return false
-        //$$ }
-        //$$
-        //$$ return OmniKeyboardSettings.isToggleSprintEnabled
-        //#else
-        return PolySprintConfig.toggleSprint
-        //#endif
+        if (client.options == null) {
+            return false
+        }
+
+        return OmniKeyboardSettings.isToggleSprintEnabled
     }
 
 val isToggleSneakEnabled: Boolean
     get() {
-        //#if MC >= 1.16.5
-        //$$ if (client.options == null) {
-        //$$     return false
-        //$$ }
-        //$$
-        //$$ return OmniKeyboardSettings.isToggleSneakEnabled
-        //#else
-        return PolySprintConfig.toggleSneak
-        //#endif
+        if (client.options == null) {
+            return false
+        }
+
+        return OmniKeyboardSettings.isToggleSneakEnabled
     }
 
-fun isSprintingToggled(keyBinding: KeyBinding? = null): Boolean {
+fun isSprintingToggled(keyBinding: KeyMapping? = null): Boolean {
     return optionallyStateful(keyBinding) {
         isToggleSprintEnabled && PolySprintConfig.toggleSprintState
     }
 }
 
-fun isSneakingToggled(keyBinding: KeyBinding? = null): Boolean {
+fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
     return optionallyStateful(keyBinding) {
         isToggleSneakEnabled && PolySprintConfig.toggleSneakState
     }
 }
 
+
+// TODO: this isnt always correct
 fun isFlyBoosting(): Boolean {
     val player = player ?: return false
     val sprintKey = OmniKeyBindings.sprint
-    return sprintKey.isPressed && PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost && player.capabilities.isFlying && player.capabilities.isCreativeMode
+    return sprintKey.isPressed && PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost && player.abilities.flying && player.abilities.instabuild
 }
 
-private fun optionallyStateful(keyBinding: KeyBinding?, consumer: () -> Boolean): Boolean {
-    if (keyBinding != null && keyBinding.isKeyDown) {
+private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean): Boolean {
+    if (keyBinding != null && keyBinding.isDown) {
         return true
     }
 

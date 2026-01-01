@@ -19,5 +19,5 @@
 package org.polyfrost.polysprint.client
 
 interface StickyKeyBindingSetter {
-    fun toggle(value: Boolean)
+    fun `polySprint$toggle`(value: Boolean)
 }

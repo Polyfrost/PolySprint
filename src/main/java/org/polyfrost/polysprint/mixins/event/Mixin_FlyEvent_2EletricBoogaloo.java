@@ -18,20 +18,22 @@
 
 package org.polyfrost.polysprint.mixins.event;
 
-import net.minecraft.entity.player.PlayerCapabilities;
-import net.minecraft.world.WorldSettings;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.world.entity.player.Abilities;
+import net.minecraft.world.level.GameType;
+import org.objectweb.asm.Opcodes;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.oneconfig.api.event.v1.events.Event;
 import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(WorldSettings.GameType.class)
+@Mixin(GameType.class)
 public abstract class Mixin_FlyEvent_2EletricBoogaloo {
-    @Redirect(method = "configurePlayerCapabilities", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/PlayerCapabilities;isFlying:Z"))
-    private void onSetFlying(PlayerCapabilities instance, boolean state) {
-        instance.isFlying = state;
+    @WrapOperation(method = "updatePlayerAbilities", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", opcode = Opcodes.PUTFIELD))
+    private void onSetFlying(Abilities instance, boolean state, Operation<Void> original) {
+        instance.flying = state;
         Event event;
         if (state) {
             event = new SprintStateEvent.Start(SprintStateEvent.Type.FLY);

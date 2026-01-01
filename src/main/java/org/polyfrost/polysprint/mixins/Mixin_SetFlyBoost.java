@@ -19,10 +19,10 @@
 package org.polyfrost.polysprint.mixins;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.entity.AbstractClientPlayer;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.util.MovementInput;
-import net.minecraft.world.World;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.polyfrost.polysprint.client.SprintState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,42 +31,38 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityPlayerSP.class)
+@Mixin(LocalPlayer.class)
 public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
-    @Shadow public MovementInput movementInput;
+    @Shadow public Input input;
 
-    public Mixin_SetFlyBoost(World worldIn, GameProfile playerProfile) {
-        super(worldIn, playerProfile);
+    public Mixin_SetFlyBoost(ClientLevel level, GameProfile profile) {
+        super(level, profile);
     }
 
-    @Inject(
-            method = "onLivingUpdate",
-            at = @At(
-                    value = "FIELD",
-                    target = "Lnet/minecraft/entity/player/PlayerCapabilities;allowFlying:Z",
-                    ordinal = 1
-            )
-    )
-    private void modifyFlightSpeed(CallbackInfo ci) {
+    @Inject(method = "aiStep", at = @At("HEAD"))
+    private void polysprint$modifyFlightSpeed(CallbackInfo ci) {
+        final float base = 0.05f;
+
         if (!SprintState.isFlyBoosting()) {
-            this.capabilities.setFlySpeed(0.05f);
+            this.getAbilities().setFlyingSpeed(base);
             return;
         }
 
         float boost = PolySprintConfig.getFlyBoostAmount();
-        this.capabilities.setFlySpeed(0.05f * boost);
-        if (this.capabilities.isFlying) {
+        this.getAbilities().setFlyingSpeed(base * boost);
+
+        if (this.getAbilities().flying) {
             double yDelta = 0.0;
-            if (this.movementInput.sneak) {
+            if (this.input.shiftKeyDown) {
                 yDelta -= 0.15 * boost;
             }
 
-            if (this.movementInput.jump) {
+            if (this.input.jumping) {
                 yDelta += 0.15 * boost;
             }
 
             if (yDelta != 0.0) {
-                this.motionY += yDelta;
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0, yDelta, 0.0));
             }
         }
     }
