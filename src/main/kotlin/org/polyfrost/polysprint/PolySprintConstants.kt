@@ -20,10 +20,7 @@ package org.polyfrost.polysprint
 
 object PolySprintConstants {
     // Sets the variables from `gradle.properties`. Depends on the `bloom` DGT plugin.
-//    const val ID: String = "@MOD_ID@"
-//    const val NAME: String = "@MOD_NAME@"
-//    const val VERSION: String = "@MOD_VERSION@"
-    const val ID: String = "polysprint"
-    const val NAME: String = "PolySprint"
-    const val VERSION: String = "1.1.0-alpha.1"
+    const val ID: String = "@MOD_ID@"
+    const val NAME: String = "@MOD_NAME@"
+    const val VERSION: String = "@MOD_VERSION@"
 }

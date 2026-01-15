@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("net.fabricmc.fabric-loom-remap") version "1.14-SNAPSHOT"
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
+    id("dev.deftu.gradle.bloom") version "0.2.0"
 }
 
 val modid = property("mod.id")
@@ -33,10 +34,15 @@ loom {
 
 dependencies {
     minecraft("com.mojang:minecraft:${property("minecraft_version")}")
+    @Suppress("UnstableApiUsage")
     mappings(loom.layered {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:${property("parchment_version")}@zip")
-        mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.${property("yalmm_version")}")
+        optionalProp("${property("parchment_version")}") {
+            parchment("org.parchmentmc.data:parchment-${property("minecraft_version")}:$it@zip")
+        }
+        optionalProp("${property("yalmm_version")}") {
+            mappings("dev.lambdaurora:yalmm-mojbackward:${property("minecraft_version")}+build.$it")
+        }
     })
     modImplementation("net.fabricmc:fabric-loader:${property("loader_version")}")
     modImplementation("org.polyfrost.oneconfig:${property("minecraft_version")}-fabric:1.0.0-alpha.181")
@@ -47,17 +53,16 @@ dependencies {
     modImplementation("org.polyfrost.oneconfig:internal:1.0.0-alpha.181")
     modImplementation("org.polyfrost.oneconfig:ui:1.0.0-alpha.181")
     modImplementation("org.polyfrost.oneconfig:utils:1.0.0-alpha.181")
-
-    implementation("dev.deftu:Bloom:0.1.2")
+    modImplementation("org.polyfrost.oneconfig:hud:1.0.0-alpha.181")
 
     modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
 }
 
-//bloom {
-//    replacement("@MOD_ID@", modid)
-//    replacement("@MOD_NAME@", modname)
-//    replacement("@MOD_VERSION@", modversion)
-//}
+bloom {
+    replacement("@MOD_ID@", modid!!)
+    replacement("@MOD_NAME@", modname!!)
+    replacement("@MOD_VERSION@", modversion!!)
+}
 
 tasks.processResources {
     val props = mapOf(
@@ -96,3 +101,6 @@ tasks.jar {
         rename { "${it}_${inputs.properties["archivesName"]}" }
     }
 }
+
+fun <T> optionalProp(property: String, block: (String) -> T?): T? =
+    findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
