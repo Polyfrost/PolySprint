@@ -18,7 +18,7 @@
 
 package org.polyfrost.polysprint.mixins;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -26,14 +26,14 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityPlayerSP.class)
+@Mixin(LocalPlayer.class)
 public abstract class Mixin_DisableWTap {
-    @Shadow protected int sprintToggleTimer;
+    @Shadow protected int sprintTriggerTime;
 
-    @Inject(method = "onLivingUpdate", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"))
     private void polysprint$disableDoubleTap(CallbackInfo ci) {
         if (PolySprintConfig.isEnabled() && PolySprintConfig.getDisableWTapSprint()) {
-            this.sprintToggleTimer = 0;
+            this.sprintTriggerTime = 0;
         }
     }
 }

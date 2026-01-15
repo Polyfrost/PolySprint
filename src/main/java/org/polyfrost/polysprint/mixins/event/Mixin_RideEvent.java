@@ -19,30 +19,30 @@
 package org.polyfrost.polysprint.mixins.event;
 
 import dev.deftu.omnicore.api.client.OmniClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.entity.Entity;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.oneconfig.api.event.v1.events.Event;
 import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(EntityLivingBase.class)
+@Mixin(Entity.class)
 public abstract class Mixin_RideEvent {
-    @Inject(method = "mountEntity", at = @At("HEAD"))
-    private void onMount(Entity entityIn, CallbackInfo ci) {
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
+    private void onMount(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         //noinspection ConstantConditions
         if ((Object) this == OmniClient.getPlayer()) {
-            Event event;
-            if (entityIn != null) {
-                event = new SprintStateEvent.Start(SprintStateEvent.Type.RIDE);
-            } else {
-                event = new SprintStateEvent.End(SprintStateEvent.Type.RIDE);
-            }
+            EventManager.INSTANCE.post(new SprintStateEvent.Start(SprintStateEvent.Type.RIDE));
+        }
+    }
 
-            EventManager.INSTANCE.post(event);
+    @Inject(method = "removeVehicle", at = @At("HEAD"))
+    private void onDismount(CallbackInfo ci) {
+        //noinspection ConstantConditions
+        if ((Object) this == OmniClient.getPlayer()) {
+            EventManager.INSTANCE.post(new SprintStateEvent.End(SprintStateEvent.Type.RIDE));
         }
     }
 }

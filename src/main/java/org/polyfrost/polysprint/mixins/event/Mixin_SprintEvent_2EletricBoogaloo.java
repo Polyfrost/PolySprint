@@ -18,7 +18,8 @@
 
 package org.polyfrost.polysprint.mixins.event;
 
-import net.minecraft.client.entity.EntityPlayerSP;
+import dev.deftu.omnicore.api.client.OmniClient;
+import net.minecraft.world.entity.LivingEntity;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -26,11 +27,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(EntityPlayerSP.class)
+@Mixin(LivingEntity.class)
 public class Mixin_SprintEvent_2EletricBoogaloo {
     @Inject(method = "setSprinting", at = @At("HEAD"))
-    private void onSetSprinting(boolean state, CallbackInfo ci) {
+    private void onSetSprinting(boolean sprinting, CallbackInfo ci) {
+        if ((Object) this != OmniClient.getPlayer()) {
+            return;
+        }
+
         SprintStateEvent.Type type = SprintStateEvent.Type.SPRINT;
-        EventManager.INSTANCE.post(state ? new SprintStateEvent.Start(type) : new SprintStateEvent.End(type));
+        EventManager.INSTANCE.post(sprinting ? new SprintStateEvent.Start(type) : new SprintStateEvent.End(type));
     }
 }

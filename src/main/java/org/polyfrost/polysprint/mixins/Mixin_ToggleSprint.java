@@ -18,23 +18,18 @@
 
 package org.polyfrost.polysprint.mixins;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.settings.KeyBinding;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.SprintState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(EntityPlayerSP.class)
+@Mixin(LocalPlayer.class)
 public class Mixin_ToggleSprint {
-    @Redirect(
-            method = "onLivingUpdate",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z"
-            )
-    )
-    private boolean setSprintState(KeyBinding keyBinding) {
-        return SprintState.isSprintingToggled(keyBinding);
+    @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 0))
+    private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
+        return SprintState.isSprintingToggled(instance);
     }
 }

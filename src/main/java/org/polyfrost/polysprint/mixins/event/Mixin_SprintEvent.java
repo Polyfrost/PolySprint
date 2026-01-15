@@ -18,31 +18,30 @@
 
 package org.polyfrost.polysprint.mixins.event;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.MovementInput;
-import net.minecraft.util.MovementInputFromOptions;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.player.KeyboardInput;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintState;
 import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(MovementInputFromOptions.class)
-public abstract class Mixin_SprintEvent extends MovementInput {
+@Mixin(KeyboardInput.class)
+public abstract class Mixin_SprintEvent extends Input {
     @Unique private boolean polysprint$sneaking = false;
 
-    @Redirect(
-            method = "updatePlayerMoveState",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z",
-                    ordinal = 5
-            )
-    )
-    private boolean setSneakState(KeyBinding keyBinding) {
-        boolean state = SprintState.isSneakingToggled(keyBinding);
+    /**
+     * In 1.16.5, MovementInputFromOptions#tick() calls KeyBinding#isKeyDown()
+     * six times in order: forward, back, left, right, jump, SNEAK (ordinal 5).
+     * We redirect only the SNEAK read to apply our toggle and emit events.
+     */
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 5))
+    private boolean polysprint$setSneakState(KeyMapping instance, Operation<Boolean> original) {
+        boolean state = SprintState.isSneakingToggled(instance);
         if (state != polysprint$sneaking) {
             polysprint$sneaking = state;
             SprintStateEvent.Type type = SprintStateEvent.Type.SNEAK;
