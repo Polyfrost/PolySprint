@@ -31,9 +31,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class Mixin_StickyKeyBindingSetter extends KeyMapping implements StickyKeyBindingSetter {
     @Unique private boolean polysprint$consumedForceToggle = false;
 
-    public Mixin_StickyKeyBindingSetter(String string, int i, String string2) {
-        super(string, i, string2);
+    //? if <1.21.10 {
+    /*public Mixin_StickyKeyBindingSetter(String string, int i, String category) {
+        super(string, i, category);
     }
+    *///?} else {
+    public Mixin_StickyKeyBindingSetter(String string, int i, KeyMapping.Category category) {
+        super(string, i, category);
+    }
+    //?}
 
     @Override
     public void polySprint$toggle(boolean value) {

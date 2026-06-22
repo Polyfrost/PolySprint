@@ -22,6 +22,7 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
+import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.api.hud.v1.TextHud
 import org.polyfrost.polyui.unit.fix
 
@@ -169,6 +170,8 @@ class PolySprintHud : TextHud(
     }
 
     override fun getText(): String? {
+        val sb = StringBuilder()
+
         if (brackets) {
             sb.append('[')
         }
@@ -178,7 +181,7 @@ class PolySprintHud : TextHud(
             if (isSneaking) {
                 if (PolySprintClient.isSneakHeld) {
                     sb.append(descendingHeld)
-                } else if (config.isEnabled && isToggleSprintEnabled && config.toggleSneakState) {
+                } else if (config.isEnabled && isToggleSneakEnabled && config.toggleSneakState) {
                     sb.append(descendingToggled)
                 } else {
                     sb.append(descending)
@@ -191,7 +194,7 @@ class PolySprintHud : TextHud(
             }
         } else if (isRiding) {
             sb.append(riding)
-        } else if (isSneaking) {
+        } else if (isSneaking || (config.isEnabled && isToggleSneakEnabled && config.toggleSneakState)) {
             if (PolySprintClient.isSneakHeld) {
                 sb.append(sneakHeld)
             } else if (config.isEnabled && isToggleSneakEnabled && config.toggleSneakState) {
@@ -199,7 +202,7 @@ class PolySprintHud : TextHud(
             } else {
                 sb.append(sneak)
             }
-        } else if (isSprinting) {
+        } else if (isSprinting || (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState)) {
             if (PolySprintClient.isSprintHeld) {
                 sb.append(sprintHeld)
             } else if (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState) {
@@ -213,8 +216,13 @@ class PolySprintHud : TextHud(
             sb.append(']')
         }
 
-//        hidden = sb.isEmpty() || (brackets && sb.length == 2)
+        val isEmpty = sb.isEmpty() || (brackets && sb.length == 2)
+        if (isEmpty && HudManager.isEditing) {
+            sb.insert(if (brackets) 1 else 0, sprintToggle)
+        }
 
-        return null
+        hidden = isEmpty && !HudManager.isEditing
+
+        return sb.toString()
     }
 }

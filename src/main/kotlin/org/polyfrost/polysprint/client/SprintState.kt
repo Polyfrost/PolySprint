@@ -20,29 +20,30 @@
 
 package org.polyfrost.polysprint.client
 
-import dev.deftu.omnicore.api.client.input.keybindings.OmniKeyBindings
-import dev.deftu.omnicore.api.client.player
-import dev.deftu.omnicore.api.client.screen.isInScreen
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.options.OmniKeyboardSettings
 import net.minecraft.client.KeyMapping
+import net.minecraft.client.Minecraft
+import org.polyfrost.oneconfig.api.hud.v1.HudManager
 
 val isToggleSprintEnabled: Boolean
     get() {
+        val client = Minecraft.getInstance()
         if (client.options == null) {
             return false
         }
 
-        return OmniKeyboardSettings.isToggleSprintEnabled
+        PolySprintConfig.syncToggleSprintFromVanilla()
+        return PolySprintConfig.toggleSprint
     }
 
 val isToggleSneakEnabled: Boolean
     get() {
+        val client = Minecraft.getInstance()
         if (client.options == null) {
             return false
         }
 
-        return OmniKeyboardSettings.isToggleSneakEnabled
+        PolySprintConfig.syncToggleSneakFromVanilla()
+        return PolySprintConfig.toggleSneak
     }
 
 fun isSprintingToggled(keyBinding: KeyMapping? = null): Boolean {
@@ -60,9 +61,10 @@ fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
 
 // TODO: this isnt always correct
 fun isFlyBoosting(): Boolean {
-    val player = player ?: return false
-    val sprintKey = OmniKeyBindings.sprint
-    return sprintKey.isPressed && PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost && player.abilities.flying && player.abilities.instabuild
+    val client = Minecraft.getInstance()
+    val player = client.player ?: return false
+    val sprintKey = client.options.keySprint
+    return sprintKey.isDown && PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost && player.abilities.flying && player.abilities.instabuild
 }
 
 private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean): Boolean {
@@ -70,5 +72,5 @@ private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean)
         return true
     }
 
-    return !isInScreen && PolySprintConfig.isEnabled && consumer()
+    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled && consumer()
 }

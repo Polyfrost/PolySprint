@@ -1,5 +1,5 @@
 {
-    "compatibilityLevel": "JAVA_8",
+    "compatibilityLevel": "JAVA_21",
     "package": "org.polyfrost.polysprint.mixins",
     "verbose": true,
     "client": [
@@ -10,6 +10,7 @@
         "event.Mixin_SprintEvent",
         "event.Mixin_SprintEvent_2EletricBoogaloo",
         "Mixin_DisableWTap",
+        "Mixin_Options",
         "Mixin_SetFlyBoost",
         "Mixin_StickyKeyBindingSetter",
         "Mixin_ToggleSprint"

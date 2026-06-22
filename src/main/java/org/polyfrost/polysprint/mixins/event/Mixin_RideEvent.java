@@ -18,7 +18,7 @@
 
 package org.polyfrost.polysprint.mixins.event;
 
-import dev.deftu.omnicore.api.client.OmniClient;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintStateEvent;
@@ -33,7 +33,7 @@ public abstract class Mixin_RideEvent {
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
     private void onMount(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         //noinspection ConstantConditions
-        if ((Object) this == OmniClient.getPlayer()) {
+        if ((Object) this == Minecraft.getInstance().player) {
             EventManager.INSTANCE.post(new SprintStateEvent.Start(SprintStateEvent.Type.RIDE));
         }
     }
@@ -41,7 +41,7 @@ public abstract class Mixin_RideEvent {
     @Inject(method = "removeVehicle", at = @At("HEAD"))
     private void onDismount(CallbackInfo ci) {
         //noinspection ConstantConditions
-        if ((Object) this == OmniClient.getPlayer()) {
+        if ((Object) this == Minecraft.getInstance().player) {
             EventManager.INSTANCE.post(new SprintStateEvent.End(SprintStateEvent.Type.RIDE));
         }
     }

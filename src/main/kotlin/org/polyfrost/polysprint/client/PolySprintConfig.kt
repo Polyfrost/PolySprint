@@ -18,15 +18,15 @@
 
 package org.polyfrost.polysprint.client
 
-import dev.deftu.omnicore.api.client.client
-import dev.deftu.omnicore.api.client.input.OmniKeys
+import com.mojang.blaze3d.platform.InputConstants
+import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.Config
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
+import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindHelper
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
-import org.polyfrost.polyui.input.KeybindHelper
 
 object PolySprintConfig : Config(
     //VigilanceMigrator(File("./config/simpletogglesprint.toml").absolutePath),
@@ -38,11 +38,17 @@ object PolySprintConfig : Config(
     @JvmStatic @Switch(title = "Enabled")
     var isEnabled = true
 
-//    @Switch(title = "Toggle Sprint")
-//    var toggleSprint = true
-//
-//    @Switch(title = "Toggle Sneak")
-//    var toggleSneak = false
+    @Switch(
+        title = "Enable Toggle Sprint",
+        subcategory = "Toggle Sprint"
+    )
+    var toggleSprint = true
+
+    @Switch(
+        title = "Enable Toggle Sneak",
+        subcategory = "Toggle Sneak"
+    )
+    var toggleSneak = false
 
     @JvmStatic @Switch(title = "Disable W-Tap Sprint")
     var disableWTapSprint = true
@@ -66,7 +72,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sprint Keybind",
         subcategory = "Toggle Sprint"
     )
-    var keybindToggleSprintKey = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.code).does {
+    var keybindToggleSprintKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action(Runnable {
         if (keybindToggleSprint) {
             if (isEnabled && isToggleSprintEnabled && !PolySprintClient.isSprintHeld) {
                 invertToggleSprintState()
@@ -74,7 +80,7 @@ object PolySprintConfig : Config(
 
             PolySprintClient.invertSprintHeld()
         }
-    }.build()
+    }).build()
 
     @Switch(
         title = "Seperate Keybind for Toggle Sneak",
@@ -87,7 +93,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sneak Keybind",
         subcategory = "Toggle Sneak"
     )
-    var keybindToggleSneakKey = KeybindHelper.builder().keys(OmniKeys.KEY_NONE.code).does {
+    var keybindToggleSneakKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action(Runnable {
         if (keybindToggleSneak) {
             if (isEnabled && isToggleSneakEnabled && !PolySprintClient.isSneakHeld) {
                 invertToggleSneakState()
@@ -95,7 +101,7 @@ object PolySprintConfig : Config(
 
             PolySprintClient.invertSneakHeld()
         }
-    }.build()
+    }).build()
 
     @Switch(
         title = "Fly Boost",
@@ -107,32 +113,83 @@ object PolySprintConfig : Config(
         title = "Fly Boost Amount",
         subcategory = "Fly Boost",
         min = 1.0F,
-        max = 10.0F
+        max = 10.0F,
+        step = 1.0F
     )
     var flyBoostAmount = 4.0F
 
     init {
-//        addDependency("keybindToggleSprint", null) { if (isToggleSprintEnabled) Property.Display.SHOWN else Property.Display.DISABLED }
-//        addDependency("keybindToggleSneak", null) { if (isToggleSneakEnabled) Property.Display.SHOWN else Property.Display.DISABLED }
-//        addDependency("keybindToggleSprint", "toggleSprint")
-//        addDependency("keybindToggleSneak", "toggleSneak")
+        addDependency("keybindToggleSprint", "toggleSprint")
+        addDependency("keybindToggleSneak", "toggleSneak")
         addDependency("flyBoostAmount", "toggleFlyBoost")
         addDependency("keybindToggleSprintKey", "keybindToggleSprint")
         addDependency("keybindToggleSneakKey", "keybindToggleSneak")
+        addCallback("toggleSprint") { syncToggleSprintToVanilla() }
+        addCallback("toggleSneak") { syncToggleSneakToVanilla() }
 
-        KeybindManager.registerKeybind(keybindToggleSprintKey)
-        KeybindManager.registerKeybind(keybindToggleSneakKey)
+        KeybindManager.register(keybindToggleSprintKey)
+        KeybindManager.register(keybindToggleSneakKey)
+    }
+
+    fun syncTogglesFromVanilla(persist: Boolean = false) {
+        val options = Minecraft.getInstance().options ?: return
+        val vanillaToggleSprint = options.toggleSprint().get()
+        val vanillaToggleSneak = options.toggleCrouch().get()
+        val changed = toggleSprint != vanillaToggleSprint || toggleSneak != vanillaToggleSneak
+
+        toggleSprint = vanillaToggleSprint
+        toggleSneak = vanillaToggleSneak
+
+        if (persist && changed) {
+            save()
+        }
+    }
+
+    fun syncToggleSprintFromVanilla(persist: Boolean = false) {
+        val options = Minecraft.getInstance().options ?: return
+        val vanillaToggleSprint = options.toggleSprint().get()
+        val changed = toggleSprint != vanillaToggleSprint
+
+        toggleSprint = vanillaToggleSprint
+
+        if (persist && changed) {
+            save()
+        }
+    }
+
+    fun syncToggleSneakFromVanilla(persist: Boolean = false) {
+        val options = Minecraft.getInstance().options ?: return
+        val vanillaToggleSneak = options.toggleCrouch().get()
+        val changed = toggleSneak != vanillaToggleSneak
+
+        toggleSneak = vanillaToggleSneak
+
+        if (persist && changed) {
+            save()
+        }
+    }
+
+    private fun syncToggleSprintToVanilla() {
+        val options = Minecraft.getInstance().options ?: return
+        options.toggleSprint().set(toggleSprint)
+        options.save()
+    }
+
+    private fun syncToggleSneakToVanilla() {
+        val options = Minecraft.getInstance().options ?: return
+        options.toggleCrouch().set(toggleSneak)
+        options.save()
     }
 
     fun invertToggleSprintState() {
         toggleSprintState = !toggleSprintState
-        (client.options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSprintState)
+        (Minecraft.getInstance().options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSprintState)
         save()
     }
 
     fun invertToggleSneakState() {
         toggleSneakState = !toggleSneakState
-        (client.options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSneakState)
+        (Minecraft.getInstance().options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSneakState)
         save()
     }
 }

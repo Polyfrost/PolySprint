@@ -16,26 +16,19 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.polyfrost.polysprint.mixins.event;
+package org.polyfrost.polysprint.mixins;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.entity.LivingEntity;
-import org.polyfrost.oneconfig.api.event.v1.EventManager;
-import org.polyfrost.polysprint.client.SprintStateEvent;
+import net.minecraft.client.Options;
+import org.polyfrost.polysprint.client.PolySprintClient;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(LivingEntity.class)
-public class Mixin_SprintEvent_2EletricBoogaloo {
-    @Inject(method = "setSprinting", at = @At("HEAD"))
-    private void onSetSprinting(boolean sprinting, CallbackInfo ci) {
-        if ((Object) this != Minecraft.getInstance().player) {
-            return;
-        }
-
-        SprintStateEvent.Type type = SprintStateEvent.Type.SPRINT;
-        EventManager.INSTANCE.post(sprinting ? new SprintStateEvent.Start(type) : new SprintStateEvent.End(type));
+@Mixin(Options.class)
+public class Mixin_Options {
+    @Inject(method = "save", at = @At("TAIL"))
+    private void polySprint$syncToggleOptions(CallbackInfo ci) {
+        PolySprintClient.syncTogglesFromVanillaOptions();
     }
 }

@@ -18,9 +18,11 @@
 
 package org.polyfrost.polysprint.client
 
-import dev.deftu.omnicore.api.client.commands.OmniClientCommands
-import dev.deftu.omnicore.api.client.commands.command
-import dev.deftu.omnicore.api.client.input.keybindings.OmniKeyBindings
+import com.mojang.blaze3d.platform.InputConstants
+import net.minecraft.client.KeyMapping
+import net.minecraft.client.Minecraft
+import org.lwjgl.glfw.GLFW
+import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
 import org.polyfrost.oneconfig.api.event.v1.events.MouseInputEvent
@@ -33,9 +35,11 @@ object PolySprintClient {
         private set
     var isSneakHeld = false
         private set
+    private var initialized = false
 
     fun initialize() {
         PolySprintConfig.preload()
+        PolySprintConfig.syncTogglesFromVanilla()
         HudManager.register(PolySprintHud())
 
         eventHandler { _: KeyInputEvent ->
@@ -46,11 +50,17 @@ object PolySprintClient {
             processInput()
         }.register()
 
-        OmniClientCommands.command(PolySprintConstants.ID) {
-            runs { ctx ->
-                ctx.source.openScreen(PolySprintConfig.createScreen())
-            }
-        }.register()
+        CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
+            PolySprintConfig.syncTogglesFromVanilla()
+            //? if =26.2 {
+            /*Minecraft.getInstance().setScreenAndShow(PolySprintConfig.createScreen())
+            *///?} else {
+            Minecraft.getInstance().setScreen(PolySprintConfig.createScreen())
+            //?}
+            1
+        })
+
+        initialized = true
     }
 
     @JvmStatic
@@ -63,13 +73,22 @@ object PolySprintClient {
         isSneakHeld = !isSneakHeld
     }
 
+    @JvmStatic
+    fun syncTogglesFromVanillaOptions() {
+        if (!initialized) {
+            return
+        }
+
+        PolySprintConfig.syncTogglesFromVanilla(persist = true)
+    }
+
     private fun processInput() {
         if (!PolySprintConfig.isEnabled) {
             return
         }
 
-        val sprintCode = OmniKeyBindings.sprint.boundValue
-        if (!PolySprintConfig.keybindToggleSprint && sprintCode.isPressed) {
+        val sprintKey = Minecraft.getInstance().options.keySprint
+        if (!PolySprintConfig.keybindToggleSprint && sprintKey.isPhysicallyDown()) {
             if (isToggleSprintEnabled && !isSprintHeld) {
                 PolySprintConfig.invertToggleSprintState()
             }
@@ -79,8 +98,8 @@ object PolySprintClient {
             isSprintHeld = false
         }
 
-        val sneakCode = OmniKeyBindings.sneak.boundValue
-        if (!PolySprintConfig.keybindToggleSneak && sneakCode.isPressed) {
+        val sneakKey = Minecraft.getInstance().options.keyShift
+        if (!PolySprintConfig.keybindToggleSneak && sneakKey.isPhysicallyDown()) {
             if (isToggleSneakEnabled && !isSneakHeld) {
                 PolySprintConfig.invertToggleSneakState()
             }
@@ -88,6 +107,23 @@ object PolySprintClient {
             isSneakHeld = true
         } else {
             isSneakHeld = false
+        }
+    }
+
+    private fun KeyMapping.isPhysicallyDown(): Boolean {
+        val key = InputConstants.getKey(saveString())
+        return when (key.type) {
+            InputConstants.Type.KEYSYM, InputConstants.Type.SCANCODE ->
+                //? if <1.21.10
+                /*InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)*/
+                //? if >=1.21.10
+                InputConstants.isKeyDown(Minecraft.getInstance().window, key.value)
+            InputConstants.Type.MOUSE ->
+                //? if <1.21.10
+                /*GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS*/
+                //? if >=1.21.10
+                GLFW.glfwGetMouseButton(Minecraft.getInstance().window.handle(), key.value) == GLFW.GLFW_PRESS
+            else -> false
         }
     }
 }

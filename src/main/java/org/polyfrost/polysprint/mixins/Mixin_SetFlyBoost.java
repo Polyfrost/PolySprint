@@ -21,7 +21,10 @@ package org.polyfrost.polysprint.mixins;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.Input;
+//? if =1.21.1
+/*import net.minecraft.client.player.Input;*/
+//? if >1.21.1
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.polyfrost.polysprint.client.SprintState;
@@ -33,7 +36,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LocalPlayer.class)
 public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
-    @Shadow public Input input;
+    //? if =1.21.1
+    /*@Shadow public Input input;*/
+    //? if >1.21.1
+    @Shadow public ClientInput input;
 
     public Mixin_SetFlyBoost(ClientLevel level, GameProfile profile) {
         super(level, profile);
@@ -53,11 +59,19 @@ public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
 
         if (this.getAbilities().flying) {
             double yDelta = 0.0;
-            if (this.input.shiftKeyDown) {
+            //? if =1.21.1 {
+            /*if (this.input.shiftKeyDown) {
+            *///?} else {
+            if (this.input.keyPresses.shift()) {
+            //?}
                 yDelta -= 0.15 * boost;
             }
 
-            if (this.input.jumping) {
+            //? if =1.21.1 {
+            /*if (this.input.jumping) {
+            *///?} else {
+            if (this.input.keyPresses.jump()) {
+            //?}
                 yDelta += 0.15 * boost;
             }
 

@@ -21,7 +21,6 @@ package org.polyfrost.polysprint.mixins.event;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.player.KeyboardInput;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintState;
@@ -31,7 +30,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(KeyboardInput.class)
-public abstract class Mixin_SprintEvent extends Input {
+public abstract class Mixin_SprintEvent {
     @Unique private boolean polysprint$sneaking = false;
 
     /**
