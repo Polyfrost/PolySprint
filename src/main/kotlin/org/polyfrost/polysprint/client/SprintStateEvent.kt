@@ -15,17 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package org.polyfrost.polysprint.commands
 
-import cc.polyfrost.oneconfig.utils.commands.annotations.Command
-import cc.polyfrost.oneconfig.utils.commands.annotations.Main
-import org.polyfrost.polysprint.core.PolySprintConfig
+package org.polyfrost.polysprint.client
 
-@Command("polysprint", aliases = ["sts", "togglesprint", "togglesneak", "simpletogglesprint"])
-class PolySprintCommand {
+import org.polyfrost.oneconfig.api.event.v1.events.Event
 
-    @Main
-    fun execCommand() {
-        PolySprintConfig.openGui()
+sealed interface SprintStateEvent : Event {
+    data class Start(val type: Type) : SprintStateEvent
+    data class End(val type: Type) : SprintStateEvent
+
+    enum class Type {
+        SPRINT,
+        RIDE,
+        SNEAK,
+        FLY
     }
 }

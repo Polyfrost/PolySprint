@@ -1,12 +1,18 @@
 {
-  "compatibilityLevel": "JAVA_8",
-  "package": "org.polyfrost.polysprint.mixins",
-  "plugin": "org.polyfrost.polysprint.tweaker.MixinPlugin",
-  "refmap": "mixins.polysprint.refmap.json",
-  "mixins": [
-    "MixinEntityPlayerSP",
-    "MixinMovementInputFromOptions",
-    "playerapi.MixinClientPlayerAPI"
-  ],
-  "verbose": true
+    "compatibilityLevel": "JAVA_21",
+    "package": "org.polyfrost.polysprint.mixins",
+    "verbose": true,
+    "client": [
+        "event.Mixin_FlyEvent",
+        "event.Mixin_FlyEvent_2EletricBoogaloo",
+        "event.Mixin_FlyEvent_NumeroTres",
+        "event.Mixin_RideEvent",
+        "event.Mixin_SprintEvent",
+        "event.Mixin_SprintEvent_2EletricBoogaloo",
+        "Mixin_DisableWTap",
+        "Mixin_Options",
+        "Mixin_SetFlyBoost",
+        "Mixin_StickyKeyBindingSetter",
+        "Mixin_ToggleSprint"
+    ]
 }

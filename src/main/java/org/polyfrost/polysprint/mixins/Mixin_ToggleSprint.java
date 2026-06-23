@@ -18,26 +18,18 @@
 
 package org.polyfrost.polysprint.mixins;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.util.MovementInput;
-import net.minecraft.util.MovementInputFromOptions;
-import org.polyfrost.polysprint.core.UtilsKt;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.player.LocalPlayer;
+import org.polyfrost.polysprint.client.SprintState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(MovementInputFromOptions.class)
-public abstract class MixinMovementInputFromOptions extends MovementInput {
-
-    @Redirect(
-            method = "updatePlayerMoveState",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/settings/KeyBinding;isKeyDown()Z"
-            )
-    )
-    private boolean setSneakState(KeyBinding keyBinding) {
-        return UtilsKt.shouldSetSneak(keyBinding);
+@Mixin(LocalPlayer.class)
+public class Mixin_ToggleSprint {
+    @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 0))
+    private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
+        return SprintState.isSprintingToggled(instance);
     }
-
 }
