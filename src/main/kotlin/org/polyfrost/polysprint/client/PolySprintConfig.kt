@@ -51,7 +51,7 @@ object PolySprintConfig : Config(
     var toggleSneak = false
 
     @JvmStatic @Switch(title = "Disable W-Tap Sprint")
-    var disableWTapSprint = true
+    var disableWTapSprint = false
 
     @JvmField
     @Include
