@@ -13,7 +13,7 @@ val modversion = property("mod.version") as String
 val mcversion = property("minecraft_version") as String
 val versionrange = property("minecraft_version_range") as String
 val loaderversion = property("loader_version") as String
-val oneconfigVersion = "1.0.0-beta.4"
+val oneconfigVersion = "1.0.0-beta.6"
 
 base {
     archivesName.set("$modid-$modversion+$mcversion")
@@ -31,12 +31,17 @@ repositories {
     maven("https://central.sonatype.com/repository/maven-snapshots")
     maven("https://repo.papermc.io/repository/maven-public")
 
-    maven("https://maven.logix.dev/snapshots")
+    maven("https://maven.logix.dev/snapshots") {
+        content { excludeGroup("com.terraformersmc") }
+    }
     maven("https://nexus.prsm.wtf/repository/maven-public/maven-repo/releases/")
     maven("https://repo.hypixel.net/repository/Hypixel/")
     maven("https://maven.deftu.dev/releases")
 
     maven("https://maven.fabricmc.net/releases")
+    maven("https://maven.terraformersmc.com/releases") {
+        content { includeGroup("com.terraformersmc") }
+    }
     maven("https://jitpack.io") {
         content { includeGroupAndSubgroups("com.github") }
     }

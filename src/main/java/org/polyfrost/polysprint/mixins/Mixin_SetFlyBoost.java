@@ -47,6 +47,10 @@ public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
 
     @Inject(method = "aiStep", at = @At("HEAD"))
     private void polysprint$modifyFlightSpeed(CallbackInfo ci) {
+        if (!SprintState.isFlyBoostEnabled()) {
+            return;
+        }
+
         final float base = 0.05f;
 
         if (!SprintState.isFlyBoosting()) {

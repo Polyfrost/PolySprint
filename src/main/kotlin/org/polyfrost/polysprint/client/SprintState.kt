@@ -59,12 +59,20 @@ fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
 }
 
 
-// TODO: this isnt always correct
+fun isFlyBoostEnabled(): Boolean {
+    if (Minecraft.getInstance().options == null) {
+        return false
+    }
+
+    return PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost
+}
+
 fun isFlyBoosting(): Boolean {
     val client = Minecraft.getInstance()
     val player = client.player ?: return false
-    val sprintKey = client.options.keySprint
-    return sprintKey.isDown && PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost && player.abilities.flying && player.abilities.instabuild
+    if (!PolySprintConfig.isEnabled || !PolySprintConfig.toggleFlyBoost) return false
+    if (!player.abilities.flying || !player.abilities.instabuild) return false
+    return PolySprintClient.isKeyPhysicallyDown(client.options.keySprint)
 }
 
 private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean): Boolean {

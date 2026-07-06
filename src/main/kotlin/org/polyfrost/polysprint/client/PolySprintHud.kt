@@ -143,6 +143,8 @@ class PolySprintHud : TextHud(
     )
     var sprint = "Sprinting (vanilla)"
 
+    override fun updateFrequency(): Long = 100_000_000L
+
     override fun setup() {
         super.setup()
 

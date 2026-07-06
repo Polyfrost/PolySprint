@@ -26,6 +26,7 @@ import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
 import org.polyfrost.oneconfig.api.event.v1.events.MouseInputEvent
+import org.polyfrost.oneconfig.api.event.v1.events.TickEvent
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.utils.v1.dsl.createScreen
 import org.polyfrost.polysprint.PolySprintConstants
@@ -40,6 +41,7 @@ object PolySprintClient {
     fun initialize() {
         PolySprintConfig.preload()
         PolySprintConfig.syncTogglesFromVanilla()
+        PolySprintConfig.syncTogglesToVanilla()
         HudManager.register(PolySprintHud())
 
         eventHandler { _: KeyInputEvent ->
@@ -48,6 +50,16 @@ object PolySprintClient {
 
         eventHandler { _: MouseInputEvent ->
             processInput()
+        }.register()
+
+        eventHandler { event: SprintStateEvent.End ->
+            if (event.type == SprintStateEvent.Type.FLY && PolySprintConfig.toggleFlyBoost) {
+                PolySprintConfig.resyncSprintKeyState()
+            }
+        }.register()
+
+        eventHandler { _: TickEvent.End ->
+            PolySprintConfig.reassertToggledKeys()
         }.register()
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
@@ -64,16 +76,6 @@ object PolySprintClient {
     }
 
     @JvmStatic
-    fun invertSprintHeld() {
-        isSprintHeld = !isSprintHeld
-    }
-
-    @JvmStatic
-    fun invertSneakHeld() {
-        isSneakHeld = !isSneakHeld
-    }
-
-    @JvmStatic
     fun syncTogglesFromVanillaOptions() {
         if (!initialized) {
             return
@@ -87,9 +89,15 @@ object PolySprintClient {
             return
         }
 
+        if (HudManager.isGuiScreenOpen) {
+            return
+        }
+
+        val flying = Minecraft.getInstance().player?.abilities?.flying == true
+
         val sprintKey = Minecraft.getInstance().options.keySprint
         if (!PolySprintConfig.keybindToggleSprint && sprintKey.isPhysicallyDown()) {
-            if (isToggleSprintEnabled && !isSprintHeld) {
+            if (!flying && isToggleSprintEnabled && !isSprintHeld) {
                 PolySprintConfig.invertToggleSprintState()
             }
 
@@ -109,6 +117,9 @@ object PolySprintClient {
             isSneakHeld = false
         }
     }
+
+    @JvmStatic
+    fun isKeyPhysicallyDown(key: KeyMapping): Boolean = key.isPhysicallyDown()
 
     private fun KeyMapping.isPhysicallyDown(): Boolean {
         val key = InputConstants.getKey(saveString())
