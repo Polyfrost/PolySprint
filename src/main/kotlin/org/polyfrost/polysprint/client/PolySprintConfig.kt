@@ -25,8 +25,10 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Keybind
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
+import org.polyfrost.oneconfig.api.ui.v1.keybind.BindNotInScreen
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindHelper
 import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
+import org.polyfrost.oneconfig.api.ui.v1.keybind.OneConfigKeybind
 
 object PolySprintConfig : Config(
     //VigilanceMigrator(File("./config/simpletogglesprint.toml").absolutePath),
@@ -68,17 +70,22 @@ object PolySprintConfig : Config(
     )
     var keybindToggleSprint = false
 
-    @Keybind(
-        title = "Toggle Sprint Keybind",
-        subcategory = "Toggle Sprint"
-    )
-    var keybindToggleSprintKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { pressed: Boolean ->
+    // Registered separately from the config field via refreshSprintKeybind. A keybind's action is transient and is
+    // lost whenever the field is loaded from disk, so the registered bind must be rebuilt from the loaded keys plus
+    // this stable action rather than registering the field object directly.
+    private val sprintToggleAction: (Boolean) -> Boolean = { pressed ->
         if (keybindToggleSprint && pressed && isEnabled && isToggleSprintEnabled) {
             invertToggleSprintState()
         }
 
         true
-    }.build()
+    }
+
+    @Keybind(
+        title = "Toggle Sprint Keybind",
+        subcategory = "Toggle Sprint"
+    )
+    var keybindToggleSprintKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { _: Boolean -> true }.build()
 
     @Switch(
         title = "Separate Keybind for Toggle Sneak",
@@ -87,17 +94,22 @@ object PolySprintConfig : Config(
     )
     var keybindToggleSneak = false
 
-    @Keybind(
-        title = "Toggle Sneak Keybind",
-        subcategory = "Toggle Sneak"
-    )
-    var keybindToggleSneakKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { pressed: Boolean ->
+    private val sneakToggleAction: (Boolean) -> Boolean = { pressed ->
         if (keybindToggleSneak && pressed && isEnabled && isToggleSneakEnabled) {
             invertToggleSneakState()
         }
 
         true
-    }.build()
+    }
+
+    @Keybind(
+        title = "Toggle Sneak Keybind",
+        subcategory = "Toggle Sneak"
+    )
+    var keybindToggleSneakKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { _: Boolean -> true }.build()
+
+    private var registeredSprintKeybind: OneConfigKeybind? = null
+    private var registeredSneakKeybind: OneConfigKeybind? = null
 
     @Switch(
         title = "Fly Boost",
@@ -122,11 +134,37 @@ object PolySprintConfig : Config(
         addDependency("keybindToggleSneakKey", "keybindToggleSneak")
         addCallback("toggleSprint") { syncToggleSprintToVanilla() }
         addCallback("toggleSneak") { syncToggleSneakToVanilla() }
-        addCallback("keybindToggleSprint") { syncToggleSprintToVanilla() }
-        addCallback("keybindToggleSneak") { syncToggleSneakToVanilla() }
 
-        KeybindManager.register(keybindToggleSprintKey)
-        KeybindManager.register(keybindToggleSneakKey)
+        addCallback("keybindToggleSprintKey") { refreshSprintKeybind() }
+        addCallback("keybindToggleSneakKey") { refreshSneakKeybind() }
+        // The disk value has already been loaded by the addDependency calls above, so refresh once now to register
+        // the saved keys; the callbacks keep them in sync on subsequent rebinds.
+        refreshSprintKeybind()
+        refreshSneakKeybind()
+    }
+
+    private fun refreshSprintKeybind() {
+        registeredSprintKeybind = replaceRegistered(registeredSprintKeybind, keybindToggleSprintKey, sprintToggleAction)
+    }
+
+    private fun refreshSneakKeybind() {
+        registeredSneakKeybind = replaceRegistered(registeredSneakKeybind, keybindToggleSneakKey, sneakToggleAction)
+    }
+
+    /**
+     * Unregisters [old] and, if [src] is bound, registers a fresh keybind built from [src]'s keys and [action],
+     * returning the newly registered keybind (or `null` if unbound). The action is supplied here rather than read
+     * from [src] because a keybind's action is transient and is null once [src] has been loaded from disk.
+     */
+    private fun replaceRegistered(
+        old: OneConfigKeybind?,
+        src: OneConfigKeybind,
+        action: (Boolean) -> Boolean
+    ): OneConfigKeybind? {
+        old?.let { KeybindManager.unregister(it) }
+        if (!src.isBound) return null
+        return BindNotInScreen(src.keyCodes, src.mouseBtns, src.mods, src.durationNanos, action)
+            .also { KeybindManager.register(it) }
     }
 
     fun syncTogglesFromVanilla(persist: Boolean = false) {
@@ -134,13 +172,7 @@ object PolySprintConfig : Config(
         syncToggleSneakFromVanilla(persist)
     }
 
-    fun syncTogglesToVanilla() {
-        syncToggleSprintToVanilla()
-        syncToggleSneakToVanilla()
-    }
-
     fun syncToggleSprintFromVanilla(persist: Boolean = false) {
-        if (keybindToggleSprint) return
         val options = Minecraft.getInstance().options ?: return
         val vanillaToggleSprint = options.toggleSprint().get()
         val changed = toggleSprint != vanillaToggleSprint
@@ -153,7 +185,6 @@ object PolySprintConfig : Config(
     }
 
     fun syncToggleSneakFromVanilla(persist: Boolean = false) {
-        if (keybindToggleSneak) return
         val options = Minecraft.getInstance().options ?: return
         val vanillaToggleSneak = options.toggleCrouch().get()
         val changed = toggleSneak != vanillaToggleSneak
@@ -167,24 +198,14 @@ object PolySprintConfig : Config(
 
     private fun syncToggleSprintToVanilla() {
         val options = Minecraft.getInstance().options ?: return
-        options.toggleSprint().set(toggleSprint && !keybindToggleSprint)
+        options.toggleSprint().set(toggleSprint)
         options.save()
     }
 
     private fun syncToggleSneakToVanilla() {
         val options = Minecraft.getInstance().options ?: return
-        options.toggleCrouch().set(toggleSneak && !keybindToggleSneak)
+        options.toggleCrouch().set(toggleSneak)
         options.save()
-    }
-
-    fun reassertToggledKeys() {
-        val options = Minecraft.getInstance().options ?: return
-        if (keybindToggleSprint && toggleSprintState) {
-            (options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(true)
-        }
-        if (keybindToggleSneak && toggleSneakState) {
-            (options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(true)
-        }
     }
 
     fun resyncSprintKeyState() {

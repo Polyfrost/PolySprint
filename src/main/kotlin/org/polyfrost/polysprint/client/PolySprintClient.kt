@@ -26,7 +26,6 @@ import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.event.v1.events.KeyInputEvent
 import org.polyfrost.oneconfig.api.event.v1.events.MouseInputEvent
-import org.polyfrost.oneconfig.api.event.v1.events.TickEvent
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.utils.v1.dsl.createScreen
 import org.polyfrost.polysprint.PolySprintConstants
@@ -41,7 +40,6 @@ object PolySprintClient {
     fun initialize() {
         PolySprintConfig.preload()
         PolySprintConfig.syncTogglesFromVanilla()
-        PolySprintConfig.syncTogglesToVanilla()
         HudManager.register(PolySprintHud())
 
         eventHandler { _: KeyInputEvent ->
@@ -56,10 +54,6 @@ object PolySprintClient {
             if (event.type == SprintStateEvent.Type.FLY && PolySprintConfig.toggleFlyBoost) {
                 PolySprintConfig.resyncSprintKeyState()
             }
-        }.register()
-
-        eventHandler { _: TickEvent.End ->
-            PolySprintConfig.reassertToggledKeys()
         }.register()
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {

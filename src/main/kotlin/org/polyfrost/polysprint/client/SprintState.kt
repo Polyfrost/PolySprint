@@ -53,9 +53,20 @@ fun isSprintingToggled(keyBinding: KeyMapping? = null): Boolean {
 }
 
 fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
-    return optionallyStateful(keyBinding) {
-        isToggleSneakEnabled && PolySprintConfig.toggleSneakState
+    // With a separate toggle keybind, the vanilla sneak key must stay hold-to-sneak. Toggle sneak
+    // keeps vanilla's sticky toggleCrouch enabled, so KeyMapping#isDown reports the sticky toggle
+    // rather than the physical press; poll the physical key state to avoid inheriting that toggle.
+    val held = if (PolySprintConfig.keybindToggleSneak) {
+        !isScreenOpen() && PolySprintClient.isKeyPhysicallyDown(keyBinding)
+    } else {
+        keyBinding.isDown
     }
+    if (held) {
+        return true
+    }
+
+    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled &&
+        isToggleSneakEnabled && PolySprintConfig.toggleSneakState
 }
 
 
@@ -81,4 +92,12 @@ private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean)
     }
 
     return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled && consumer()
+}
+
+private fun isScreenOpen(): Boolean {
+    //? if >=26.2 {
+    /*return Minecraft.getInstance().gui.screen() != null
+    *///?} else {
+    return Minecraft.getInstance().screen != null
+    //?}
 }
