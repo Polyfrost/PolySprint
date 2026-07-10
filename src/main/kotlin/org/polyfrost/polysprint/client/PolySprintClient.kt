@@ -39,6 +39,8 @@ object PolySprintClient {
     private var sprintLastPhysicallyDown = false
     private var sneakLastPhysicallyDown = false
 
+    private var lastFlying = false
+
     fun initialize() {
         PolySprintConfig.preload()
         PolySprintConfig.syncTogglesFromVanilla()
@@ -90,6 +92,13 @@ object PolySprintClient {
         }
 
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
+
+        if (lastFlying != flying) {
+            if (PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
+                PolySprintConfig.invertToggleSneakState()
+
+            lastFlying = flying
+        }
 
         val sprintKey = Minecraft.getInstance().options.keySprint
         val sprintPhysicallyDown = sprintKey.isPhysicallyDown()

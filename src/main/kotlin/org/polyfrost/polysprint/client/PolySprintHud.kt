@@ -190,6 +190,11 @@ class PolySprintHud : TextHud(
                 }
             } else {
                 sb.append(flying)
+
+                if (isSprinting && config.showSprintTextWhileFlying) {
+                    sb.append(" + ${getSprintText(config)}")
+                }
+
                 if (isFlyBoosting()) {
                     sb.append(' ').append(config.flyBoostAmount.fix(2)).append(flyBoostText)
                 }
@@ -205,13 +210,7 @@ class PolySprintHud : TextHud(
                 sb.append(sneak)
             }
         } else if (isSprinting || (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState)) {
-            if (PolySprintClient.isSprintHeld) {
-                sb.append(sprintHeld)
-            } else if (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState) {
-                sb.append(sprintToggle)
-            } else {
-                sb.append(sprint)
-            }
+            sb.append(getSprintText(config))
         }
 
         if (brackets) {
@@ -226,5 +225,11 @@ class PolySprintHud : TextHud(
         hidden = isEmpty && !HudManager.isEditing
 
         return sb.toString()
+    }
+
+    private fun getSprintText(config: PolySprintConfig): String {
+        if (PolySprintClient.isSprintHeld) return sprintHeld
+        if (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState) return sprintToggle
+        return sprint
     }
 }
