@@ -21,15 +21,32 @@ package org.polyfrost.polysprint.mixins;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.KeyboardInput;
+import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintState;
+import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(LocalPlayer.class)
+@Mixin(KeyboardInput.class)
 public class Mixin_ToggleSprint {
-    @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 0))
+    @Unique
+    private boolean polysprint$isToggleActive = false;
+
+    @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 6))
     private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
+        if (Minecraft.getInstance().player == null) return SprintState.isSprintingToggled(instance);
+
+        if (SprintState.isSprintToggleActive() != polysprint$isToggleActive) {
+            polysprint$isToggleActive = SprintState.isSprintToggleActive();
+            if (SprintState.isSprintToggleActive() || !Minecraft.getInstance().player.isSprinting()) {
+                SprintStateEvent.Type type = SprintStateEvent.Type.SPRINT;
+                EventManager.INSTANCE.post(SprintState.isSprintToggleActive() ? new SprintStateEvent.Start(type) : new SprintStateEvent.End(type));
+            }
+        }
+
         return SprintState.isSprintingToggled(instance);
     }
 }
