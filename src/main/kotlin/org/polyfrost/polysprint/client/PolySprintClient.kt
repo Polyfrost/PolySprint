@@ -90,7 +90,7 @@ object PolySprintClient {
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
 
         val sprintKey = Minecraft.getInstance().options.keySprint
-        if (!PolySprintConfig.keybindToggleSprint && sprintKey.isPhysicallyDown()) {
+        if ((!isToggleSprintEnabled || PolySprintConfig.keybindToggleSprint) && sprintKey.isPhysicallyDown()) {
             if (!flying && isToggleSprintEnabled && !isSprintHeld) {
                 PolySprintConfig.invertToggleSprintState()
             }
@@ -101,7 +101,7 @@ object PolySprintClient {
         }
 
         val sneakKey = Minecraft.getInstance().options.keyShift
-        if (!PolySprintConfig.keybindToggleSneak && sneakKey.isPhysicallyDown()) {
+        if ((!isToggleSneakEnabled || PolySprintConfig.keybindToggleSneak) && sneakKey.isPhysicallyDown()) {
             if (isToggleSneakEnabled && !isSneakHeld) {
                 PolySprintConfig.invertToggleSneakState()
             }
@@ -123,11 +123,13 @@ object PolySprintClient {
                 /*InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)*/
                 //? if >=1.21.10
                 InputConstants.isKeyDown(Minecraft.getInstance().window, key.value)
+
             InputConstants.Type.MOUSE ->
                 //? if <1.21.10
                 /*GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS*/
                 //? if >=1.21.10
                 GLFW.glfwGetMouseButton(Minecraft.getInstance().window.handle(), key.value) == GLFW.GLFW_PRESS
+
             else -> false
         }
     }
