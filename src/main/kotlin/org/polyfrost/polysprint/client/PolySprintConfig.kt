@@ -128,10 +128,15 @@ object PolySprintConfig : Config(
 
     init {
         addDependency("keybindToggleSprint", "toggleSprint")
-        addDependency("keybindToggleSneak", "toggleSneak")
-        addDependency("flyBoostAmount", "toggleFlyBoost")
+        addDependency("keybindToggleSprintKey", "toggleSprint")
         addDependency("keybindToggleSprintKey", "keybindToggleSprint")
+
+        addDependency("keybindToggleSneak", "toggleSneak")
+        addDependency("keybindToggleSneakKey", "toggleSneak")
         addDependency("keybindToggleSneakKey", "keybindToggleSneak")
+
+        addDependency("flyBoostAmount", "toggleFlyBoost")
+
         addCallback("toggleSprint") { syncToggleSprintToVanilla() }
         addCallback("toggleSneak") { syncToggleSneakToVanilla() }
 
