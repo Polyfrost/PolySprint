@@ -112,7 +112,13 @@ object PolySprintConfig : Config(
     private var registeredSneakKeybind: OneConfigKeybind? = null
 
     @Switch(
-        title = "Unsneak On Flight Start",
+        title = "Show Sprint Text while Flying",
+        subcategory = "Flying"
+    )
+    var showSprintTextWhileFlying = true
+
+    @Switch(
+        title = "Unsneak on Flight Start",
         subcategory = "Flying"
     )
     var unsneakOnFlightStart = true
