@@ -112,14 +112,20 @@ object PolySprintConfig : Config(
     private var registeredSneakKeybind: OneConfigKeybind? = null
 
     @Switch(
+        title = "Unsneak On Flight Start",
+        subcategory = "Flying"
+    )
+    var unsneakOnFlightStart = true
+
+    @Switch(
         title = "Fly Boost",
-        subcategory = "Fly Boost"
+        subcategory = "Flying"
     )
     var toggleFlyBoost = false
 
     @JvmStatic @Slider(
         title = "Fly Boost Amount",
-        subcategory = "Fly Boost",
+        subcategory = "Flying",
         min = 1.0F,
         max = 10.0F,
         step = 1.0F
