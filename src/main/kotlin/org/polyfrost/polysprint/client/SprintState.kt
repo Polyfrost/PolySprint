@@ -47,9 +47,28 @@ val isToggleSneakEnabled: Boolean
     }
 
 fun isSprintingToggled(keyBinding: KeyMapping? = null): Boolean {
-    return optionallyStateful(keyBinding) {
-        isToggleSprintEnabled && PolySprintConfig.toggleSprintState
+    // With a separate toggle keybind, the vanilla sprint key must stay hold-to-sprint. Toggle sprint
+    // keeps vanilla's sticky toggleSprint enabled, so KeyMapping#isDown reports the sticky toggle
+    // rather than the physical press; poll the physical key state to avoid inheriting that toggle.
+    val held = if (keyBinding != null) {
+        if (PolySprintConfig.keybindToggleSprint) {
+            !isScreenOpen() && PolySprintClient.isKeyPhysicallyDown(keyBinding)
+        } else {
+            keyBinding.isDown
+        }
+    } else {
+        false
     }
+    if (held) {
+        return true
+    }
+
+    return isSprintToggleActive()
+}
+
+fun isSprintToggleActive(): Boolean {
+    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled &&
+            isToggleSprintEnabled && PolySprintConfig.toggleSprintState
 }
 
 fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
@@ -84,14 +103,6 @@ fun isFlyBoosting(): Boolean {
     if (!PolySprintConfig.isEnabled || !PolySprintConfig.toggleFlyBoost) return false
     if (!player.abilities.flying || !player.abilities.instabuild) return false
     return PolySprintClient.isKeyPhysicallyDown(client.options.keySprint)
-}
-
-private fun optionallyStateful(keyBinding: KeyMapping?, consumer: () -> Boolean): Boolean {
-    if (keyBinding != null && keyBinding.isDown) {
-        return true
-    }
-
-    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled && consumer()
 }
 
 private fun isScreenOpen(): Boolean {

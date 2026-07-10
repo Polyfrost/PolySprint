@@ -36,6 +36,8 @@ object PolySprintClient {
     var isSneakHeld = false
         private set
     private var initialized = false
+    private var sprintLastPhysicallyDown = false
+    private var sneakLastPhysicallyDown = false
 
     fun initialize() {
         PolySprintConfig.preload()
@@ -90,26 +92,29 @@ object PolySprintClient {
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
 
         val sprintKey = Minecraft.getInstance().options.keySprint
-        if ((!isToggleSprintEnabled || PolySprintConfig.keybindToggleSprint) && sprintKey.isPhysicallyDown()) {
-            if (!flying && isToggleSprintEnabled && !isSprintHeld) {
-                PolySprintConfig.invertToggleSprintState()
-            }
+        val sprintPhysicallyDown = sprintKey.isPhysicallyDown()
 
-            isSprintHeld = true
-        } else {
-            isSprintHeld = false
-        }
+        if (!flying
+            && isToggleSprintEnabled
+            && !PolySprintConfig.keybindToggleSprint
+            && sprintPhysicallyDown
+            && !sprintLastPhysicallyDown
+        ) PolySprintConfig.invertToggleSprintState()
+
+        sprintLastPhysicallyDown = sprintPhysicallyDown
+        isSprintHeld = (!isToggleSprintEnabled || PolySprintConfig.keybindToggleSprint) && sprintPhysicallyDown
 
         val sneakKey = Minecraft.getInstance().options.keyShift
-        if ((!isToggleSneakEnabled || PolySprintConfig.keybindToggleSneak) && sneakKey.isPhysicallyDown()) {
-            if (isToggleSneakEnabled && !isSneakHeld) {
-                PolySprintConfig.invertToggleSneakState()
-            }
+        val sneakPhysicallyDown = sneakKey.isPhysicallyDown()
 
-            isSneakHeld = true
-        } else {
-            isSneakHeld = false
-        }
+        if (isToggleSneakEnabled
+            && !PolySprintConfig.keybindToggleSneak
+            && sneakPhysicallyDown
+            && !sneakLastPhysicallyDown
+        ) PolySprintConfig.invertToggleSneakState()
+
+        sneakLastPhysicallyDown = sneakPhysicallyDown
+        isSneakHeld = (!isToggleSneakEnabled || PolySprintConfig.keybindToggleSneak) && sneakPhysicallyDown
     }
 
     @JvmStatic
