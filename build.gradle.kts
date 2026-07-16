@@ -5,6 +5,7 @@ plugins {
     id("dev.kikugie.loom-back-compat")
     id("org.jetbrains.kotlin.jvm") version "2.3.0"
     id("dev.deftu.gradle.bloom") version "0.2.0"
+    id("me.modmuss50.mod-publish-plugin") version "1.1.0"
 }
 
 val modid = property("mod.id") as String
@@ -13,7 +14,7 @@ val modversion = property("mod.version") as String
 val mcversion = property("minecraft_version") as String
 val versionrange = property("minecraft_version_range") as String
 val loaderversion = property("loader_version") as String
-val oneconfigVersion = "1.0.0-beta.6"
+val oneconfigVersion = "1.0.0-beta.7"
 
 base {
     archivesName.set("$modid-$modversion+$mcversion")
@@ -160,3 +161,38 @@ tasks.jar {
 
 fun <T> optionalProp(property: String, block: (String) -> T?): T? =
     findProperty(property)?.toString()?.takeUnless { it.isBlank() }?.let(block)
+
+val modrinthMinecraftVersionOverride = mapOf(
+    "26.1" to listOf("26.1", "26.1.1", "26.1.2")
+)
+
+val modrinthId = listOf("oneconfig.publish.modrinth", "publish.modrinth").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
+val modrinthToken = listOf("oneconfig.publish.modrinth.token", "publish.modrinth.token", "modrinth.token").firstNotNullOfOrNull { findProperty(it) }?.toString()?.takeIf { it.isNotBlank() }
+val minecraftVersion = modrinthMinecraftVersionOverride[mcversion] ?: listOf(mcversion)
+val publishJarTaskName = if ("remapJar" in tasks.names) "remapJar" else "jar"
+val changelogs = rootProject.file("CHANGELOG.md").takeIf { it.exists() }?.readText() ?: "No changelog provided."
+
+publishMods {
+    file = tasks.named<AbstractArchiveTask>(publishJarTaskName).flatMap { it.archiveFile }
+
+    displayName = modversion
+    version = "v$modversion"
+    changelog = changelogs
+    type = STABLE
+
+    modLoaders.add("fabric")
+
+    dryRun = modrinthId == null || modrinthToken == null
+
+    if (modrinthId != null) {
+        modrinth {
+            projectId = modrinthId
+            accessToken = modrinthToken.orEmpty()
+
+            minecraftVersions.addAll(minecraftVersion)
+
+            requires("oneconfig")
+            requires("fabric-language-kotlin")
+        }
+    }
+}
