@@ -14,7 +14,7 @@ val modversion = property("mod.version") as String
 val mcversion = property("minecraft_version") as String
 val versionrange = property("minecraft_version_range") as String
 val loaderversion = property("loader_version") as String
-val oneconfigVersion = "1.0.0-beta.7"
+val oneconfigVersion = "1.0.1"
 
 base {
     archivesName.set("$modid-$modversion+$mcversion")
