@@ -232,4 +232,6 @@ class PolySprintHud : TextHud(
         if (config.isEnabled && isToggleSprintEnabled && config.toggleSprintState) return sprintToggle
         return sprint
     }
+
+    override fun defaultPosition(): Pair<Float, Float> = 10f to 10f
 }
