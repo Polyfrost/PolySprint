@@ -19,6 +19,8 @@
 package org.polyfrost.polysprint.mixins;
 
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.ToggleKeyMapping;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.polyfrost.polysprint.client.StickyKeyBindingSetter;
@@ -47,6 +49,17 @@ public abstract class Mixin_StickyKeyBindingSetter extends KeyMapping implements
     @Inject(method = "setDown", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;setDown(Z)V", ordinal = 0), cancellable = true)
     private void onSetDown(boolean bl, CallbackInfo ci) {
         if (!PolySprintConfig.isEnabled()) {
+            return;
+        }
+
+        Options options = Minecraft.getInstance().options;
+        if (options == null) {
+            return;
+        }
+
+        // PolySprint only drives the sprint and sneak toggles; other ToggleKeyMappings (e.g. the vanilla
+        // Attack/Use toggles added in 1.21.10) must keep their native toggle behavior.
+        if (this != options.keySprint && this != options.keyShift) {
             return;
         }
 
