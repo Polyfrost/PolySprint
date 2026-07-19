@@ -44,7 +44,7 @@ object PolySprintClient {
     fun initialize() {
         PolySprintConfig.preload()
         PolySprintConfig.syncTogglesFromVanilla()
-        HudManager.register(PolySprintHud())
+        HudManager.register(PolySprintHud(), PolySprintConstants.ID, "assets/polysprint/polysprint_dark.svg")
 
         eventHandler { _: KeyInputEvent ->
             processInput()
