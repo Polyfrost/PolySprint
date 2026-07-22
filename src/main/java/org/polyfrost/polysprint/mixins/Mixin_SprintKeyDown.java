@@ -37,7 +37,7 @@ public class Mixin_SprintKeyDown {
     // breaking momentary sprint. Route these reads through the same state resolution as newer versions.
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean polysprint$sprintKeyDown(KeyMapping instance, Operation<Boolean> original) {
-        return SprintState.isSprintingToggled(instance);
+        return SprintState.isSprintingToggled(instance, original.call(instance));
     }
     *///?}
 }

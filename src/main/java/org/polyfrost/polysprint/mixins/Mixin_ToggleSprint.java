@@ -37,7 +37,8 @@ public class Mixin_ToggleSprint {
 
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 6))
     private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
-        if (Minecraft.getInstance().player == null) return SprintState.isSprintingToggled(instance);
+        boolean vanilla = original.call(instance);
+        if (Minecraft.getInstance().player == null) return vanilla;
 
         if (SprintState.isSprintToggleActive() != polysprint$isToggleActive) {
             polysprint$isToggleActive = SprintState.isSprintToggleActive();
@@ -47,6 +48,6 @@ public class Mixin_ToggleSprint {
             }
         }
 
-        return SprintState.isSprintingToggled(instance);
+        return SprintState.isSprintingToggled(instance, vanilla);
     }
 }
