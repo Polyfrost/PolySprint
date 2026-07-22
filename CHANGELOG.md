@@ -1,2 +1,2 @@
-## 1.1.3
-- Fixed regular sprint key not working at all with separate toggle sprint key on 1.21.1–1.21.4
+## 1.1.4
+- Fixed HUD saying "Descending" while it is cancelled out by holding the Jump key
