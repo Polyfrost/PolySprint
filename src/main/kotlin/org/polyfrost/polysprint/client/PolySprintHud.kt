@@ -18,6 +18,7 @@
 
 package org.polyfrost.polysprint.client
 
+import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
@@ -180,7 +181,7 @@ class PolySprintHud : TextHud(
 
         val config = PolySprintConfig
         if (isFlying) {
-            if (isSneaking) {
+            if (isSneaking && !isJumpHeld()) {
                 if (PolySprintClient.isSneakHeld) {
                     sb.append(descendingHeld)
                 } else if (config.isEnabled && isToggleSneakEnabled && config.toggleSneakState) {
@@ -226,6 +227,9 @@ class PolySprintHud : TextHud(
 
         return sb.toString()
     }
+
+    private fun isJumpHeld(): Boolean =
+        PolySprintClient.isKeyPhysicallyDown(Minecraft.getInstance().options.keyJump)
 
     private fun getSprintText(config: PolySprintConfig): String {
         if (PolySprintClient.isSprintHeld) return sprintHeld
