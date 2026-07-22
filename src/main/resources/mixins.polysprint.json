@@ -12,6 +12,7 @@
         "Mixin_DisableWTap",
         "Mixin_Options",
         "Mixin_SetFlyBoost",
+        "Mixin_SprintKeyDown",
         "Mixin_StickyKeyBindingSetter",
         "Mixin_ToggleSprint"
     ]
