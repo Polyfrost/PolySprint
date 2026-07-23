@@ -1,7 +1,11 @@
 {
+    "required": true,
     "compatibilityLevel": "JAVA_21",
     "package": "org.polyfrost.polysprint.mixins",
     "verbose": true,
+    "injectors": {
+        "defaultRequire": 1
+    },
     "client": [
         "event.Mixin_FlyEvent",
         "event.Mixin_FlyEvent_2EletricBoogaloo",

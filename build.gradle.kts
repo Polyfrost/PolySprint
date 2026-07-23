@@ -91,6 +91,13 @@ dependencies {
     implementation("org.polyfrost:polyui:2.1.7")
 
     modImplementation("net.fabricmc:fabric-language-kotlin:${property("fabric_kotlin_version")}")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:6.1.2")
+    testImplementation("net.fabricmc:fabric-loader-junit:${property("loader_version")}")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 bloom {
