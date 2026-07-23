@@ -18,23 +18,28 @@
 
 package org.polyfrost.polysprint.mixins;
 
+//? if >1.21.1 {
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.KeyboardInput;
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintState;
 import org.polyfrost.polysprint.client.SprintStateEvent;
-import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+//?}
+import net.minecraft.client.player.KeyboardInput;
+import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(KeyboardInput.class)
 public class Mixin_ToggleSprint {
+    //? if >1.21.1 {
     @Unique
     private boolean polysprint$isToggleActive = false;
 
+    // On 1.21.1, KeyboardInput#tick has no keySprint.isDown() call; sprinting is driven by
+    // LocalPlayer#aiStep, whose isDown() reads are routed through Mixin_SprintKeyDown instead.
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 6))
     private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
         boolean vanilla = original.call(instance);
@@ -50,4 +55,5 @@ public class Mixin_ToggleSprint {
 
         return SprintState.isSprintingToggled(instance, vanilla);
     }
+    //?}
 }
