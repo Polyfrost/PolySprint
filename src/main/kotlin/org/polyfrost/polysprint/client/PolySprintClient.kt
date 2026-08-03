@@ -54,10 +54,20 @@ object PolySprintClient {
             processInput()
         }.register()
 
-        eventHandler { event: SprintStateEvent.End ->
-            if (event.type == SprintStateEvent.Type.FLY && PolySprintConfig.toggleFlyBoost) {
-                PolySprintConfig.resyncSprintKeyState()
+        eventHandler { event: SprintStateEvent.Start ->
+            if (event.type != SprintStateEvent.Type.FLY || lastFlying) return@eventHandler
+
+            lastFlying = true
+            if (PolySprintConfig.isEnabled && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart) {
+                PolySprintConfig.invertToggleSneakState()
             }
+        }.register()
+
+        eventHandler { event: SprintStateEvent.End ->
+            if (event.type != SprintStateEvent.Type.FLY) return@eventHandler
+
+            lastFlying = false
+            if (PolySprintConfig.toggleFlyBoost) PolySprintConfig.resyncSprintKeyState()
         }.register()
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
@@ -94,7 +104,7 @@ object PolySprintClient {
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
 
         if (lastFlying != flying) {
-            if (PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
+            if (flying && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
                 PolySprintConfig.invertToggleSneakState()
 
             lastFlying = flying
@@ -134,13 +144,13 @@ object PolySprintClient {
         return when (key.type) {
             InputConstants.Type.KEYSYM, InputConstants.Type.SCANCODE ->
                 //? if <1.21.10
-                /*InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)*/
+                //InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)
                 //? if >=1.21.10
                 InputConstants.isKeyDown(Minecraft.getInstance().window, key.value)
 
             InputConstants.Type.MOUSE ->
                 //? if <1.21.10
-                /*GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS*/
+                //GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS
                 //? if >=1.21.10
                 GLFW.glfwGetMouseButton(Minecraft.getInstance().window.handle(), key.value) == GLFW.GLFW_PRESS
 
