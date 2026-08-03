@@ -134,13 +134,13 @@ object PolySprintClient {
         return when (key.type) {
             InputConstants.Type.KEYSYM, InputConstants.Type.SCANCODE ->
                 //? if <1.21.10
-                /*InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)*/
+                //InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)
                 //? if >=1.21.10
                 InputConstants.isKeyDown(Minecraft.getInstance().window, key.value)
 
             InputConstants.Type.MOUSE ->
                 //? if <1.21.10
-                /*GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS*/
+                //GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS
                 //? if >=1.21.10
                 GLFW.glfwGetMouseButton(Minecraft.getInstance().window.handle(), key.value) == GLFW.GLFW_PRESS
 

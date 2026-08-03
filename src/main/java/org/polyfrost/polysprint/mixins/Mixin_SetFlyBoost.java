@@ -22,7 +22,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 //? if =1.21.1
-/*import net.minecraft.client.player.Input;*/
+//import net.minecraft.client.player.Input;
 //? if >1.21.1
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LocalPlayer.class)
 public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
     //? if =1.21.1
-    /*@Shadow public Input input;*/
+    //@Shadow public Input input;
     //? if >1.21.1
     @Shadow public ClientInput input;
 
