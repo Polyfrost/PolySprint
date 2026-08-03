@@ -179,11 +179,14 @@ object PolySprintConfig : Config(
     }
 
     fun syncTogglesFromVanilla(persist: Boolean = false) {
+        //? if > 1.8.9 {
         syncToggleSprintFromVanilla(persist)
         syncToggleSneakFromVanilla(persist)
+        //?}
     }
 
     fun syncToggleSprintFromVanilla(persist: Boolean = false) {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         val vanillaToggleSprint = options.toggleSprint().get()
         val changed = toggleSprint != vanillaToggleSprint
@@ -193,9 +196,11 @@ object PolySprintConfig : Config(
         if (persist && changed) {
             save()
         }
+        //?}
     }
 
     fun syncToggleSneakFromVanilla(persist: Boolean = false) {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         val vanillaToggleSneak = options.toggleCrouch().get()
         val changed = toggleSneak != vanillaToggleSneak
@@ -205,39 +210,52 @@ object PolySprintConfig : Config(
         if (persist && changed) {
             save()
         }
+        //?}
     }
 
     private fun syncToggleSprintToVanilla() {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         options.toggleSprint().set(toggleSprint)
         options.save()
+        //?}
     }
 
     private fun syncToggleSneakToVanilla() {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         options.toggleCrouch().set(toggleSneak)
         options.save()
+        //?}
     }
 
     fun resyncSprintKeyState() {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         (options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(toggleSprintState)
+        //?}
     }
 
     fun resyncSneakKeyState() {
+        //? if > 1.8.9 {
         val options = Minecraft.getInstance().options ?: return
         (options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(toggleSneakState)
+        //?}
     }
 
     fun invertToggleSprintState() {
         toggleSprintState = !toggleSprintState
+        //? if > 1.8.9 {
         (Minecraft.getInstance().options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSprintState)
+        //?}
         save()
     }
 
     fun invertToggleSneakState() {
         toggleSneakState = !toggleSneakState
+        //? if > 1.8.9 {
         (Minecraft.getInstance().options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSneakState)
+        //?}
         save()
     }
 }

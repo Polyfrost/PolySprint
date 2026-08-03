@@ -23,7 +23,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 //? if >= 26.3 {
 /*import org.lwjgl.sdl.SDLMouse
-*///?} else
+*///?} elif > 1.8.9
 import org.lwjgl.glfw.GLFW
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
@@ -33,6 +33,11 @@ import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.utils.v1.dsl.createScreen
 import org.polyfrost.polysprint.PolySprintConstants
 import org.polyfrost.polysprint.client.isFlyBoostEnabled
+//? if = 1.8.9 {
+/*import org.polyfrost.oneconfig.internal.legacy.KeyCodes
+import org.lwjgl.input.Keyboard
+import org.lwjgl.input.Mouse
+*///?}
 
 object PolySprintClient {
     var isSprintHeld = false
@@ -143,6 +148,7 @@ object PolySprintClient {
     fun isKeyPhysicallyDown(key: KeyMapping): Boolean = key.isPhysicallyDown()
 
     private fun KeyMapping.isPhysicallyDown(): Boolean {
+        //? if > 1.8.9 {
         val key = InputConstants.getKey(saveString())
         return when (key.type) {
             //? if >= 26.3 {
@@ -168,5 +174,12 @@ object PolySprintClient {
 
             else -> false
         }
+        //?} else {
+        /*return if (keyCode < 0) {
+            Mouse.isButtonDown(keyCode + 100)
+        } else {
+            keyCode > 0 && Keyboard.isKeyDown(keyCode)
+        }
+        *///?}
     }
 }
