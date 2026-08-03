@@ -54,10 +54,20 @@ object PolySprintClient {
             processInput()
         }.register()
 
-        eventHandler { event: SprintStateEvent.End ->
-            if (event.type == SprintStateEvent.Type.FLY && PolySprintConfig.toggleFlyBoost) {
-                PolySprintConfig.resyncSprintKeyState()
+        eventHandler { event: SprintStateEvent.Start ->
+            if (event.type != SprintStateEvent.Type.FLY || lastFlying) return@eventHandler
+
+            lastFlying = true
+            if (PolySprintConfig.isEnabled && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart) {
+                PolySprintConfig.invertToggleSneakState()
             }
+        }.register()
+
+        eventHandler { event: SprintStateEvent.End ->
+            if (event.type != SprintStateEvent.Type.FLY) return@eventHandler
+
+            lastFlying = false
+            if (PolySprintConfig.toggleFlyBoost) PolySprintConfig.resyncSprintKeyState()
         }.register()
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
@@ -94,7 +104,7 @@ object PolySprintClient {
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
 
         if (lastFlying != flying) {
-            if (PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
+            if (flying && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
                 PolySprintConfig.invertToggleSneakState()
 
             lastFlying = flying
