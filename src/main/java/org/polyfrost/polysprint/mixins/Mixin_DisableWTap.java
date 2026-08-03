@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class Mixin_DisableWTap {
     @Shadow protected int sprintTriggerTime;
 
+    //~ if = 1.8.9 'tick' -> 'aiStep'
     @Inject(method = "tick", at = @At("HEAD"))
     private void polysprint$disableDoubleTap(CallbackInfo ci) {
         if (PolySprintConfig.isEnabled() && PolySprintConfig.getDisableWTapSprint()) {
