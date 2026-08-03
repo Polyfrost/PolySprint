@@ -33,7 +33,10 @@ import org.spongepowered.asm.mixin.injection.At;
 public class Mixin_FlyEvent_NumeroTres {
     @WrapOperation(method = "aiStep", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Abilities;flying:Z", opcode = Opcodes.PUTFIELD))
     private void onSetFlying(Abilities instance, boolean state, Operation<Void> original) {
-        instance.flying = state;
+        boolean changed = instance.flying != state;
+        original.call(instance, state);
+        if (!changed) return;
+
         Event event;
         if (state) {
             event = new SprintStateEvent.Start(SprintStateEvent.Type.FLY);
