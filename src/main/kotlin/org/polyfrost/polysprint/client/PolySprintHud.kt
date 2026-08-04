@@ -20,7 +20,6 @@ package org.polyfrost.polysprint.client
 
 import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
-import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
@@ -38,8 +37,9 @@ class PolySprintHud : TextHud(
     private var isSprinting = false
     private var isRiding = false
 
-    @Switch(title = "Brackets")
-    private var brackets = true
+    init {
+        brackets = true
+    }
 
     @Button(
         title = "Reset Text on ALL HUDs",
@@ -175,10 +175,6 @@ class PolySprintHud : TextHud(
     override fun getText(): String? {
         val sb = StringBuilder()
 
-        if (brackets) {
-            sb.append('[')
-        }
-
         val config = PolySprintConfig
         if (isFlying) {
             if (isSneaking && !isJumpHeld()) {
@@ -214,13 +210,9 @@ class PolySprintHud : TextHud(
             sb.append(getSprintText(config))
         }
 
-        if (brackets) {
-            sb.append(']')
-        }
-
-        val isEmpty = sb.isEmpty() || (brackets && sb.length == 2)
+        val isEmpty = sb.isEmpty()
         if (isEmpty && HudManager.isEditing) {
-            sb.insert(if (brackets) 1 else 0, sprintToggle)
+            sb.append(sprintToggle)
         }
 
         hidden = isEmpty && !HudManager.isEditing
