@@ -31,10 +31,8 @@ import org.spongepowered.asm.mixin.Mixin;
 @Mixin(LocalPlayer.class)
 public class Mixin_SprintKeyDown {
     //? if <1.21.5 {
-    /*// Before 1.21.5, LocalPlayer#aiStep reads keySprint.isDown() directly to drive sprinting, so it never
-    // passes through the KeyboardInput toggle wrap. When vanilla sprint is set to Toggle and a separate toggle
-    // keybind is used, PolySprint cancels the sticky toggle on keySprint, leaving isDown() stuck false and
-    // breaking momentary sprint. Route these reads through the same state resolution as newer versions.
+    /*// Before 1.21.5 LocalPlayer#aiStep reads keySprint.isDown() directly and never hits the KeyboardInput
+    // toggle wrap so route those reads through the same state resolution as newer versions
     @WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean polysprint$sprintKeyDown(KeyMapping instance, Operation<Boolean> original) {
         return SprintState.isSprintingToggled(instance, original.call(instance));

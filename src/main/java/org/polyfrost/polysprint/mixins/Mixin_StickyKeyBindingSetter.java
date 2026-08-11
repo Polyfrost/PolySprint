@@ -57,8 +57,7 @@ public abstract class Mixin_StickyKeyBindingSetter extends KeyMapping implements
             return;
         }
 
-        // PolySprint only drives the sprint and sneak toggles; other ToggleKeyMappings (e.g. the vanilla
-        // Attack/Use toggles added in 1.21.10) must keep their native toggle behavior.
+        // Other ToggleKeyMappings such as the vanilla Attack and Use toggles must keep native behavior
         if (this != options.keySprint && this != options.keyShift) {
             return;
         }

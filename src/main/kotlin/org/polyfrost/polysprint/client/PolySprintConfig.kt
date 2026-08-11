@@ -31,7 +31,6 @@ import org.polyfrost.oneconfig.api.ui.v1.keybind.KeybindManager
 import org.polyfrost.oneconfig.api.ui.v1.keybind.OneConfigKeybind
 
 object PolySprintConfig : Config(
-    //VigilanceMigrator(File("./config/simpletogglesprint.toml").absolutePath),
     "polysprint.json",
     "/assets/polysprint/polysprint_dark.svg",
     "PolySprint",
@@ -70,9 +69,8 @@ object PolySprintConfig : Config(
     )
     var keybindToggleSprint = false
 
-    // Registered separately from the config field via refreshSprintKeybind. A keybind's action is transient and is
-    // lost whenever the field is loaded from disk, so the registered bind must be rebuilt from the loaded keys plus
-    // this stable action rather than registering the field object directly.
+    // A keybind action is transient and lost on load from disk so the bind is rebuilt from the loaded keys
+    // plus this stable action instead of registering the field itself
     private val sprintToggleAction: (Boolean) -> Boolean = { pressed ->
         if (keybindToggleSprint && pressed && isEnabled && isToggleSprintEnabled) {
             invertToggleSprintState()
@@ -154,8 +152,7 @@ object PolySprintConfig : Config(
 
         addCallback("keybindToggleSprintKey") { refreshSprintKeybind() }
         addCallback("keybindToggleSneakKey") { refreshSneakKeybind() }
-        // The disk value has already been loaded by the addDependency calls above, so refresh once now to register
-        // the saved keys; the callbacks keep them in sync on subsequent rebinds.
+        // Disk values are loaded by the addDependency calls above so register the saved keys once here
         refreshSprintKeybind()
         refreshSneakKeybind()
     }
@@ -168,11 +165,7 @@ object PolySprintConfig : Config(
         registeredSneakKeybind = replaceRegistered(registeredSneakKeybind, keybindToggleSneakKey, sneakToggleAction)
     }
 
-    /**
-     * Unregisters [old] and, if [src] is bound, registers a fresh keybind built from [src]'s keys and [action],
-     * returning the newly registered keybind (or `null` if unbound). The action is supplied here rather than read
-     * from [src] because a keybind's action is transient and is null once [src] has been loaded from disk.
-     */
+    // Action is passed in rather than read from src because it is transient and null once src loads from disk
     private fun replaceRegistered(
         old: OneConfigKeybind?,
         src: OneConfigKeybind,

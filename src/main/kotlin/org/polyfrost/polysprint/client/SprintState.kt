@@ -47,19 +47,16 @@ val isToggleSneakEnabled: Boolean
     }
 
 fun isSprintingToggled(keyBinding: KeyMapping, original: Boolean): Boolean {
-    // Toggle sprint is currently on, so force sprinting regardless of the key's own state.
     if (isSprintToggleActive()) {
         return true
     }
 
-    // Only take over the vanilla sprint key when a separate toggle keybind is in use. Toggle sprint keeps
-    // vanilla's sticky toggleSprint enabled, so KeyMapping#isDown reports the sticky toggle rather than the
-    // physical press; poll the physical key state to avoid inheriting that toggle.
+    // Vanilla sticky toggleSprint stays on so KeyMapping#isDown reports the toggle and not the press
+    // Poll the physical key instead
     if (PolySprintConfig.isEnabled && PolySprintConfig.keybindToggleSprint && isToggleSprintEnabled) {
         return !isScreenOpen() && PolySprintClient.isKeyPhysicallyDown(keyBinding)
     }
 
-    // PolySprint isn't driving this key; defer to the original behavior to stay compatible with other mods.
     return original
 }
 
@@ -69,9 +66,8 @@ fun isSprintToggleActive(): Boolean {
 }
 
 fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
-    // With a separate toggle keybind, the vanilla sneak key must stay hold-to-sneak. Toggle sneak
-    // keeps vanilla's sticky toggleCrouch enabled, so KeyMapping#isDown reports the sticky toggle
-    // rather than the physical press; poll the physical key state to avoid inheriting that toggle.
+    // Vanilla sticky toggleCrouch stays on so KeyMapping#isDown reports the toggle and not the press
+    // Poll the physical key to keep the vanilla sneak key hold-to-sneak
     val held = if (PolySprintConfig.keybindToggleSneak) {
         !isScreenOpen() && PolySprintClient.isKeyPhysicallyDown(keyBinding)
     } else {

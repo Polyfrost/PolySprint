@@ -33,11 +33,7 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class Mixin_SprintEvent {
     @Unique private boolean polysprint$sneaking = false;
 
-    /**
-     * In 1.16.5, MovementInputFromOptions#tick() calls KeyBinding#isKeyDown()
-     * six times in order: forward, back, left, right, jump, SNEAK (ordinal 5).
-     * We redirect only the SNEAK read to apply our toggle and emit events.
-     */
+    // tick reads isDown for forward back left right jump then sneak so ordinal 5 is the sneak read
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 5))
     private boolean polysprint$setSneakState(KeyMapping instance, Operation<Boolean> original) {
         boolean state = SprintState.isSneakingToggled(instance);

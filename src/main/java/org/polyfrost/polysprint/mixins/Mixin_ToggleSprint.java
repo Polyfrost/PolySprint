@@ -38,8 +38,7 @@ public class Mixin_ToggleSprint {
     @Unique
     private boolean polysprint$isToggleActive = false;
 
-    // On 1.21.1, KeyboardInput#tick has no keySprint.isDown() call; sprinting is driven by
-    // LocalPlayer#aiStep, whose isDown() reads are routed through Mixin_SprintKeyDown instead.
+    // On 1.21.1 KeyboardInput#tick has no keySprint.isDown() call and Mixin_SprintKeyDown handles it instead
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 6))
     private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
         boolean vanilla = original.call(instance);
