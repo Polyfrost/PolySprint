@@ -112,7 +112,7 @@ object PolySprintClient {
         val sprintKey = Minecraft.getInstance().options.keySprint
         val sprintPhysicallyDown = sprintKey.isPhysicallyDown()
 
-        if (!flying
+        if (!isFlyBoostUsingSprintKey()
             && isToggleSprintEnabled
             && !PolySprintConfig.keybindToggleSprint
             && sprintPhysicallyDown

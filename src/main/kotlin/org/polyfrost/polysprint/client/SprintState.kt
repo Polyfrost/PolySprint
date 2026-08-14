@@ -90,12 +90,14 @@ fun isFlyBoostEnabled(): Boolean {
     return PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost
 }
 
+fun isFlyBoostUsingSprintKey(): Boolean {
+    val player = Minecraft.getInstance().player ?: return false
+    return isFlyBoostEnabled() && player.abilities.flying && player.abilities.instabuild
+}
+
 fun isFlyBoosting(): Boolean {
-    val client = Minecraft.getInstance()
-    val player = client.player ?: return false
-    if (!PolySprintConfig.isEnabled || !PolySprintConfig.toggleFlyBoost) return false
-    if (!player.abilities.flying || !player.abilities.instabuild) return false
-    return PolySprintClient.isKeyPhysicallyDown(client.options.keySprint)
+    if (!isFlyBoostUsingSprintKey()) return false
+    return PolySprintClient.isKeyPhysicallyDown(Minecraft.getInstance().options.keySprint)
 }
 
 private fun isScreenOpen(): Boolean {
