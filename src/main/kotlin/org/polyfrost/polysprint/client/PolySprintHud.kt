@@ -33,9 +33,13 @@ class PolySprintHud : TextHud(
     prefix = ""
 ) {
     private var isSneaking = false
-    private var isFlying = false
     private var isSprinting = false
     private var isRiding = false
+
+    // Flight lives on the player, which a world change replaces without ever writing a new value over the
+    // old one, so the fly events carry no transition to cache and the state is read from the player instead
+    private val isFlying: Boolean
+        get() = Minecraft.getInstance().player?.abilities?.flying == true
 
     init {
         brackets = true
@@ -152,9 +156,9 @@ class PolySprintHud : TextHud(
         eventHandler { event: SprintStateEvent.Start ->
             when (event.type) {
                 SprintStateEvent.Type.SNEAK -> isSneaking = true
-                SprintStateEvent.Type.FLY -> isFlying = true
                 SprintStateEvent.Type.RIDE -> isRiding = true
                 SprintStateEvent.Type.SPRINT -> isSprinting = true
+                SprintStateEvent.Type.FLY -> {}
             }
 
             updateAndRecalculate()
@@ -163,9 +167,9 @@ class PolySprintHud : TextHud(
         eventHandler { event: SprintStateEvent.End ->
             when (event.type) {
                 SprintStateEvent.Type.SNEAK -> isSneaking = false
-                SprintStateEvent.Type.FLY -> isFlying = false
                 SprintStateEvent.Type.RIDE -> isRiding = false
                 SprintStateEvent.Type.SPRINT -> isSprinting = false
+                SprintStateEvent.Type.FLY -> {}
             }
 
             updateAndRecalculate()

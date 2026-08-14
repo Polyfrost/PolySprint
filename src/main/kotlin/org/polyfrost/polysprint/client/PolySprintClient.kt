@@ -55,19 +55,11 @@ object PolySprintClient {
         }.register()
 
         eventHandler { event: SprintStateEvent.Start ->
-            if (event.type != SprintStateEvent.Type.FLY || lastFlying) return@eventHandler
-
-            lastFlying = true
-            if (PolySprintConfig.isEnabled && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart) {
-                PolySprintConfig.invertToggleSneakState()
-            }
+            if (event.type == SprintStateEvent.Type.FLY) onFlyingChanged(true)
         }.register()
 
         eventHandler { event: SprintStateEvent.End ->
-            if (event.type != SprintStateEvent.Type.FLY) return@eventHandler
-
-            lastFlying = false
-            if (PolySprintConfig.toggleFlyBoost) PolySprintConfig.resyncSprintKeyState()
+            if (event.type == SprintStateEvent.Type.FLY) onFlyingChanged(false)
         }.register()
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
@@ -92,6 +84,19 @@ object PolySprintClient {
         PolySprintConfig.syncTogglesFromVanilla(persist = true)
     }
 
+    // The fly events already fire only on a real change, so they are acted on without consulting lastFlying,
+    // which a world change can leave stale by replacing the player instead of writing over the old value
+    private fun onFlyingChanged(flying: Boolean) {
+        lastFlying = flying
+        if (flying) {
+            if (PolySprintConfig.isEnabled && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart) {
+                PolySprintConfig.invertToggleSneakState()
+            }
+        } else if (PolySprintConfig.toggleFlyBoost) {
+            PolySprintConfig.resyncSprintKeyState()
+        }
+    }
+
     private fun processInput() {
         if (!PolySprintConfig.isEnabled) {
             return
@@ -102,13 +107,7 @@ object PolySprintClient {
         }
 
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
-
-        if (lastFlying != flying) {
-            if (flying && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart)
-                PolySprintConfig.invertToggleSneakState()
-
-            lastFlying = flying
-        }
+        if (lastFlying != flying) onFlyingChanged(flying)
 
         val sprintKey = Minecraft.getInstance().options.keySprint
         val sprintPhysicallyDown = sprintKey.isPhysicallyDown()
