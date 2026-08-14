@@ -29,6 +29,7 @@ import org.polyfrost.oneconfig.api.event.v1.events.MouseInputEvent
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.utils.v1.dsl.createScreen
 import org.polyfrost.polysprint.PolySprintConstants
+import org.polyfrost.polysprint.client.isFlyBoostEnabled
 
 object PolySprintClient {
     var isSprintHeld = false
@@ -92,7 +93,7 @@ object PolySprintClient {
             if (PolySprintConfig.isEnabled && PolySprintConfig.toggleSneakState && PolySprintConfig.unsneakOnFlightStart) {
                 PolySprintConfig.invertToggleSneakState()
             }
-        } else if (PolySprintConfig.toggleFlyBoost) {
+        } else if (isFlyBoostEnabled()) {
             PolySprintConfig.resyncSprintKeyState()
         }
     }

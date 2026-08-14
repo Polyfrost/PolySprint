@@ -123,7 +123,8 @@ object PolySprintConfig : Config(
 
     @Switch(
         title = "Fly Boost",
-        subcategory = "Flying"
+        subcategory = "Flying",
+        description = "Enable fly boost (singleplayer only).",
     )
     var toggleFlyBoost = false
 

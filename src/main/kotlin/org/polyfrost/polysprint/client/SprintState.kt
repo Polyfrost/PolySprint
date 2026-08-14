@@ -83,11 +83,14 @@ fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
 
 
 fun isFlyBoostEnabled(): Boolean {
-    if (Minecraft.getInstance().options == null) {
+    val client = Minecraft.getInstance()
+    if (client.options == null) {
         return false
     }
 
-    return PolySprintConfig.isEnabled && PolySprintConfig.toggleFlyBoost
+    return PolySprintConfig.isEnabled &&
+        PolySprintConfig.toggleFlyBoost &&
+        !client.isMultiplayerServer()
 }
 
 fun isFlyBoostUsingSprintKey(): Boolean {
