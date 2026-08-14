@@ -1,2 +1,2 @@
-## 1.2.0
-removed brackets option in favor of oneconfig's own brackets option
+## 1.2.1
+- Fixed the mod sometimes falsely saying "Flying" when you're not
