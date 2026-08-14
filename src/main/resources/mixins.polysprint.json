@@ -15,6 +15,7 @@
         "event.Mixin_SprintEvent_2EletricBoogaloo",
         "Mixin_DisableWTap",
         "Mixin_Options",
+        "Mixin_RestoreToggleKeyStates",
         "Mixin_SetFlyBoost",
         "Mixin_SprintKeyDown",
         "Mixin_StickyKeyBindingSetter",

@@ -224,6 +224,11 @@ object PolySprintConfig : Config(
         (options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(toggleSprintState)
     }
 
+    fun resyncSneakKeyState() {
+        val options = Minecraft.getInstance().options ?: return
+        (options.keyShift as StickyKeyBindingSetter).`polySprint$toggle`(toggleSneakState)
+    }
+
     fun invertToggleSprintState() {
         toggleSprintState = !toggleSprintState
         (Minecraft.getInstance().options.keySprint as StickyKeyBindingSetter).`polySprint$toggle`(PolySprintConfig.toggleSprintState)

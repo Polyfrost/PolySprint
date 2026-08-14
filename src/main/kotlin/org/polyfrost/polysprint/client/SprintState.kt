@@ -65,6 +65,24 @@ fun isSprintToggleActive(): Boolean {
             isToggleSprintEnabled && PolySprintConfig.toggleSprintState
 }
 
+// Vanilla releases the sprint and sneak toggles while a screen is open and restores them once it closes,
+// but Mixin_StickyKeyBindingSetter cancels that restore because PolySprint owns those key states.
+// Mods that read the key mappings directly, such as ViaFabricPlus on <=1.21.4 protocols, would otherwise
+// keep seeing them released after the screen closes
+fun restoreToggleKeyStates() {
+    if (!PolySprintConfig.isEnabled) {
+        return
+    }
+
+    if (isToggleSprintEnabled) {
+        PolySprintConfig.resyncSprintKeyState()
+    }
+
+    if (isToggleSneakEnabled) {
+        PolySprintConfig.resyncSneakKeyState()
+    }
+}
+
 fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
     // Vanilla sticky toggleCrouch stays on so KeyMapping#isDown reports the toggle and not the press
     // Poll the physical key to keep the vanilla sneak key hold-to-sneak
