@@ -102,8 +102,8 @@ fun isFlyBoosting(): Boolean {
 
 private fun isScreenOpen(): Boolean {
     //? if >=26.2 {
-    /*return Minecraft.getInstance().gui.screen() != null
-    *///?} else {
-    return Minecraft.getInstance().screen != null
-    //?}
+    return Minecraft.getInstance().gui.screen() != null
+    //?} else {
+    /*return Minecraft.getInstance().screen != null
+    *///?}
 }

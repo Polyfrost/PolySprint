@@ -65,10 +65,10 @@ object PolySprintClient {
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
             PolySprintConfig.syncTogglesFromVanilla()
             //? if =26.2 {
-            /*Minecraft.getInstance().setScreenAndShow(PolySprintConfig.createScreen())
-            *///?} else {
-            Minecraft.getInstance().setScreen(PolySprintConfig.createScreen())
-            //?}
+            Minecraft.getInstance().setScreenAndShow(PolySprintConfig.createScreen())
+            //?} else {
+            /*Minecraft.getInstance().setScreen(PolySprintConfig.createScreen())
+            *///?}
             1
         })
 
