@@ -21,6 +21,9 @@ package org.polyfrost.polysprint.client
 import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+//? if >= 26.3 {
+/*import org.lwjgl.sdl.SDLMouse
+*///?} else
 import org.lwjgl.glfw.GLFW
 import org.polyfrost.oneconfig.api.commands.v1.CommandManager
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
@@ -142,17 +145,26 @@ object PolySprintClient {
     private fun KeyMapping.isPhysicallyDown(): Boolean {
         val key = InputConstants.getKey(saveString())
         return when (key.type) {
+            //? if >= 26.3 {
+            /*InputConstants.Type.KEYBOARD
+            *///?} else
             InputConstants.Type.KEYSYM, InputConstants.Type.SCANCODE ->
-                //? if <1.21.10
-                //InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)
-                //? if >=1.21.10
+                //? if >= 26.3 {
+                /*InputConstants.isKeyDown(key.value)
+                *///?} elif >= 1.21.10 {
                 InputConstants.isKeyDown(Minecraft.getInstance().window, key.value)
+                //?} else {
+                /*InputConstants.isKeyDown(Minecraft.getInstance().window.window, key.value)
+                *///?}
 
             InputConstants.Type.MOUSE ->
-                //? if <1.21.10
-                //GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS
-                //? if >=1.21.10
+                //? if >= 26.3 {
+                /*key.value > 0 && (SDLMouse.SDL_GetMouseState(null, null) and (1 shl (key.value - 1))) != 0
+                *///?} elif >= 1.21.10 {
                 GLFW.glfwGetMouseButton(Minecraft.getInstance().window.handle(), key.value) == GLFW.GLFW_PRESS
+                //?} else {
+                /*GLFW.glfwGetMouseButton(Minecraft.getInstance().window.window, key.value) == GLFW.GLFW_PRESS
+                *///?}
 
             else -> false
         }
