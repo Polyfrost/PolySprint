@@ -19,12 +19,18 @@
 package org.polyfrost.polysprint.mixins;
 
 import com.mojang.authlib.GameProfile;
+//? if > 1.8.9 {
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 //? if =1.21.1
 //import net.minecraft.client.player.Input;
 //? if >1.21.1
 import net.minecraft.client.player.ClientInput;
+//?} else {
+/*import net.minecraft.client.entity.living.player.ClientPlayerEntity;
+import net.minecraft.client.entity.living.player.Input;
+import net.minecraft.world.World;
+*///?}
 import net.minecraft.client.player.LocalPlayer;
 import org.polyfrost.polysprint.client.PolySprintConfig;
 import org.polyfrost.polysprint.client.SprintState;
@@ -34,6 +40,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if > 1.8.9 {
 @Mixin(LocalPlayer.class)
 public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
     //? if =1.21.1
@@ -85,3 +92,30 @@ public abstract class Mixin_SetFlyBoost extends AbstractClientPlayer {
         }
     }
 }
+//?} else {
+/*@Mixin(LocalPlayer.class)
+public abstract class Mixin_SetFlyBoost extends ClientPlayerEntity {
+    @Shadow public Input input;
+
+    public Mixin_SetFlyBoost(World world, GameProfile profile) {
+        super(world, profile);
+    }
+
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/living/player/Input;tick()V", shift = At.Shift.AFTER))
+    private void polysprint$modifyFlightSpeed(CallbackInfo ci) {
+        if (!SprintState.isFlyBoostEnabled()) {
+            return;
+        }
+
+        final float base = 0.05f;
+
+        if (!SprintState.isFlyBoosting()) {
+            this.abilities.setFlySpeed(base);
+            return;
+        }
+
+        float boost = PolySprintConfig.getFlyBoostAmount();
+        this.abilities.setFlySpeed(base * boost);
+    }
+}
+*///?}

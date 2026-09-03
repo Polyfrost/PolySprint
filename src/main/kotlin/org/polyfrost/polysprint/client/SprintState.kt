@@ -108,7 +108,10 @@ fun isFlyBoostEnabled(): Boolean {
 
     return PolySprintConfig.isEnabled &&
         PolySprintConfig.toggleFlyBoost &&
+        //? if > 1.8.9 {
         !client.isMultiplayerServer()
+        //?} else
+        //client.isLocalServer
 }
 
 fun isFlyBoostUsingSprintKey(): Boolean {

@@ -20,6 +20,10 @@ package org.polyfrost.polysprint.mixins.event;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
+//? if = 1.8.9 {
+/*import net.minecraft.world.entity.LivingEntity;
+import org.polyfrost.oneconfig.api.event.v1.events.Event;
+*///?}
 import org.polyfrost.oneconfig.api.event.v1.EventManager;
 import org.polyfrost.polysprint.client.SprintStateEvent;
 import org.spongepowered.asm.mixin.Mixin;
@@ -28,8 +32,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+//~ if = 1.8.9 'Entity' -> 'LivingEntity'
 @Mixin(Entity.class)
 public abstract class Mixin_RideEvent {
+    //? if > 1.8.9 {
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;)Z", at = @At("HEAD"))
     private void onMount(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         //noinspection ConstantConditions
@@ -45,4 +51,19 @@ public abstract class Mixin_RideEvent {
             EventManager.INSTANCE.post(new SprintStateEvent.End(SprintStateEvent.Type.RIDE));
         }
     }
+    //?} else {
+    /*@Inject(method = "startRiding(Lnet/minecraft/entity/Entity;)V", at = @At("HEAD"))
+    private void onMount(Entity entity, CallbackInfo ci) {
+        if ((Object) this == Minecraft.getInstance().player) {
+            Event event;
+            if (entity != null) {
+                event = new SprintStateEvent.Start(SprintStateEvent.Type.RIDE);
+            } else {
+                event = new SprintStateEvent.End(SprintStateEvent.Type.RIDE);
+            }
+
+            EventManager.INSTANCE.post(event);
+        }
+    }
+    *///?}
 }
