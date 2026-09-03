@@ -64,9 +64,7 @@ dependencies {
     }
     implementation("org.polyfrost:polyui:${sc.properties.get<String>("deps.polyui")}")
 
-    for (module in arrayOf("fabric-command-api-v2", "fabric-lifecycle-events-v1")) {
-        modImplementation(fabricApi.module(module, fapiversion))
-    }
+    modImplementation("net.fabricmc.fabric-api:fabric-api:$fapiversion")
 
     testImplementation("org.junit.jupiter:junit-jupiter:${sc.properties.get<String>("deps.junit")}")
     testImplementation("net.fabricmc:fabric-loader-junit:$loaderversion")
