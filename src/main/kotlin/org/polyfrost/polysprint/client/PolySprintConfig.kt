@@ -18,7 +18,6 @@
 
 package org.polyfrost.polysprint.client
 
-import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.Config
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
@@ -83,7 +82,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sprint Keybind",
         subcategory = "Toggle Sprint"
     )
-    var keybindToggleSprintKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { _: Boolean -> true }.build()
+    var keybindToggleSprintKey = KeybindHelper.builder().build()
 
     @Switch(
         title = "Separate Keybind for Toggle Sneak",
@@ -104,7 +103,7 @@ object PolySprintConfig : Config(
         title = "Toggle Sneak Keybind",
         subcategory = "Toggle Sneak"
     )
-    var keybindToggleSneakKey = KeybindHelper.builder().key(InputConstants.UNKNOWN.value).action { _: Boolean -> true }.build()
+    var keybindToggleSneakKey = KeybindHelper.builder().build()
 
     private var registeredSprintKeybind: OneConfigKeybind? = null
     private var registeredSneakKeybind: OneConfigKeybind? = null
