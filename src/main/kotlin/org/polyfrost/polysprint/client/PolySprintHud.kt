@@ -20,6 +20,7 @@ package org.polyfrost.polysprint.client
 
 import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
+import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
@@ -150,10 +151,18 @@ class PolySprintHud : TextHud(
 
     private var hasText = false
 
+    @Include
+    private var hiddenMigrated = false
+
     override fun updateFrequency(): Long = 100_000_000L
 
     override fun setup() {
         super.setup()
+
+        if (!hiddenMigrated) {
+            hidden = false
+            hiddenMigrated = true
+        }
 
         eventHandler { event: SprintStateEvent.Start ->
             when (event.type) {
