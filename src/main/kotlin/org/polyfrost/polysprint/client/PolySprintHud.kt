@@ -148,6 +148,8 @@ class PolySprintHud : TextHud(
     )
     var sprint = "Sprinting (vanilla)"
 
+    private var hasText = false
+
     override fun updateFrequency(): Long = 100_000_000L
 
     override fun setup() {
@@ -214,15 +216,15 @@ class PolySprintHud : TextHud(
             sb.append(getSprintText(config))
         }
 
-        val isEmpty = sb.isEmpty()
-        if (isEmpty && HudManager.isEditing) {
+        hasText = sb.isNotEmpty()
+        if (!hasText && HudManager.isEditing) {
             sb.append(sprintToggle)
         }
 
-        hidden = isEmpty && !HudManager.isEditing
-
         return sb.toString()
     }
+
+    override fun shouldShow(): Boolean = hasText
 
     private fun isJumpHeld(): Boolean =
         PolySprintClient.isKeyPhysicallyDown(Minecraft.getInstance().options.keyJump)
