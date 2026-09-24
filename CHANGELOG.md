@@ -1,2 +1,2 @@
-## 1.3.0
-- Added support for Minecraft 26.3
+## 1.3.1
+- fix: stop overwriting the HUD's hidden setting
