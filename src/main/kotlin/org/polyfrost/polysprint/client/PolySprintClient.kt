@@ -73,7 +73,7 @@ object PolySprintClient {
 
         CommandManager.register(CommandManager.literal(PolySprintConstants.ID).executes {
             PolySprintConfig.syncTogglesFromVanilla()
-            //? if =26.2 {
+            //? if >=26.2 {
             Minecraft.getInstance().setScreenAndShow(PolySprintConfig.createScreen())
             //?} else {
             /*Minecraft.getInstance().setScreen(PolySprintConfig.createScreen())
@@ -152,9 +152,10 @@ object PolySprintClient {
         val key = InputConstants.getKey(saveString())
         return when (key.type) {
             //? if >= 26.3 {
-            /*InputConstants.Type.KEYBOARD
-            *///?} else
+            /*InputConstants.Type.KEYBOARD ->
+            *///?} else {
             InputConstants.Type.KEYSYM, InputConstants.Type.SCANCODE ->
+            //?}
                 //? if >= 26.3 {
                 /*InputConstants.isKeyDown(key.value)
                 *///?} elif >= 1.21.10 {

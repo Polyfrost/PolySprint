@@ -20,6 +20,7 @@ package org.polyfrost.polysprint.client
 
 import net.minecraft.client.Minecraft
 import org.polyfrost.oneconfig.api.config.v1.annotations.Button
+import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
 import org.polyfrost.oneconfig.api.hud.v1.HudManager
@@ -148,10 +149,20 @@ class PolySprintHud : TextHud(
     )
     var sprint = "Sprinting (vanilla)"
 
+    private var hasText = false
+
+    @Include
+    private var hiddenMigrated = false
+
     override fun updateFrequency(): Long = 100_000_000L
 
     override fun setup() {
         super.setup()
+
+        if (!hiddenMigrated) {
+            hidden = false
+            hiddenMigrated = true
+        }
 
         eventHandler { event: SprintStateEvent.Start ->
             when (event.type) {
@@ -214,15 +225,15 @@ class PolySprintHud : TextHud(
             sb.append(getSprintText(config))
         }
 
-        val isEmpty = sb.isEmpty()
-        if (isEmpty && HudManager.isEditing) {
+        hasText = sb.isNotEmpty()
+        if (!hasText && HudManager.isEditing) {
             sb.append(sprintToggle)
         }
 
-        hidden = isEmpty && !HudManager.isEditing
-
         return sb.toString()
     }
+
+    override fun shouldShow(): Boolean = hasText
 
     private fun isJumpHeld(): Boolean =
         PolySprintClient.isKeyPhysicallyDown(Minecraft.getInstance().options.keyJump)
