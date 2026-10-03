@@ -18,7 +18,7 @@
 
 package org.polyfrost.polysprint.mixins;
 
-//? if >1.21.1 {
+//? if > 1.21.1 || = 1.8.9 {
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.KeyMapping;
@@ -30,16 +30,22 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 //?}
 import net.minecraft.client.player.KeyboardInput;
+//? if = 1.8.9
+//import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 
+//~ if = 1.8.9 'KeyboardInput' -> 'LocalPlayer'
 @Mixin(KeyboardInput.class)
 public class Mixin_ToggleSprint {
-    //? if >1.21.1 {
+    //? if >1.21.1 || = 1.8.9 {
     @Unique
     private boolean polysprint$isToggleActive = false;
 
     // On 1.21.1 KeyboardInput#tick has no keySprint.isDown() call and Mixin_SprintKeyDown handles it instead
+    //? if > 1.8.9 {
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 6))
+    //?} else
+    //@WrapOperation(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z"))
     private boolean setSprintState(KeyMapping instance, Operation<Boolean> original) {
         boolean vanilla = original.call(instance);
         if (Minecraft.getInstance().player == null) return vanilla;

@@ -18,6 +18,7 @@
 
 package org.polyfrost.polysprint.mixins;
 
+//? if > 1.8.9 {
 //? if <1.21.5 {
 /*import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -39,3 +40,10 @@ public class Mixin_SprintKeyDown {
     }
     *///?}
 }
+//?} else {
+/*import net.minecraft.SharedConstants;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(SharedConstants.class)
+public abstract class Mixin_SprintKeyDown {}
+*///?}

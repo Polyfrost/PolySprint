@@ -18,6 +18,7 @@
 
 package org.polyfrost.polysprint.mixins;
 
+//? if > 1.8.9 {
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -65,3 +66,11 @@ public abstract class Mixin_StickyKeyBindingSetter extends KeyMapping implements
         ci.cancel();
     }
 }
+//?} else {
+/*import net.minecraft.SharedConstants;
+import org.spongepowered.asm.mixin.Mixin;
+
+@Mixin(SharedConstants.class)
+public abstract class Mixin_StickyKeyBindingSetter {
+}
+*///?}
