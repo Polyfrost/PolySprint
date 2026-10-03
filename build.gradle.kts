@@ -231,7 +231,7 @@ publishMods {
 
     modLoaders.add(loader)
 
-    dryRun = modrinthId == null || modrinthToken == null || !isOrnithe
+    dryRun = modrinthId == null || modrinthToken == null
 
     if (modrinthId != null) {
         modrinth {
@@ -240,7 +240,10 @@ publishMods {
 
             minecraftVersions.addAll(compatibleVersions.ifEmpty { listOf(mcversion) })
 
-            requires("oneconfig", "fabric-api", "fabric-language-kotlin")
+            requires("oneconfig", "fabric-language-kotlin")
+            if (!isOrnithe) {
+                requires("fabric-api")
+            }
         }
     }
 }
