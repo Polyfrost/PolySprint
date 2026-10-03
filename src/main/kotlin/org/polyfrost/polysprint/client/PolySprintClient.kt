@@ -107,19 +107,21 @@ object PolySprintClient {
     }
 
     private fun processInput() {
-        if (!PolySprintConfig.isEnabled) {
-            return
-        }
+        val sprintKey = Minecraft.getInstance().options.keySprint
+        val sprintPhysicallyDown = sprintKey.isPhysicallyDown()
+        val sneakKey = Minecraft.getInstance().options.keyShift
+        val sneakPhysicallyDown = sneakKey.isPhysicallyDown()
 
-        if (HudManager.isGuiScreenOpen) {
+        if (!PolySprintConfig.isEnabled || Minecraft.getInstance().player == null || isScreenOpen()) {
+            sprintLastPhysicallyDown = sprintPhysicallyDown
+            sneakLastPhysicallyDown = sneakPhysicallyDown
+            isSprintHeld = false
+            isSneakHeld = false
             return
         }
 
         val flying = Minecraft.getInstance().player?.abilities?.flying == true
         if (lastFlying != flying) onFlyingChanged(flying)
-
-        val sprintKey = Minecraft.getInstance().options.keySprint
-        val sprintPhysicallyDown = sprintKey.isPhysicallyDown()
 
         if (!isFlyBoostUsingSprintKey()
             && isToggleSprintEnabled
@@ -130,9 +132,6 @@ object PolySprintClient {
 
         sprintLastPhysicallyDown = sprintPhysicallyDown
         isSprintHeld = (!isToggleSprintEnabled || PolySprintConfig.keybindToggleSprint) && sprintPhysicallyDown
-
-        val sneakKey = Minecraft.getInstance().options.keyShift
-        val sneakPhysicallyDown = sneakKey.isPhysicallyDown()
 
         if (isToggleSneakEnabled
             && !PolySprintConfig.keybindToggleSneak

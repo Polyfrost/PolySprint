@@ -22,7 +22,6 @@ package org.polyfrost.polysprint.client
 
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
-import org.polyfrost.oneconfig.api.hud.v1.HudManager
 
 val isToggleSprintEnabled: Boolean
     get() {
@@ -61,7 +60,7 @@ fun isSprintingToggled(keyBinding: KeyMapping, original: Boolean): Boolean {
 }
 
 fun isSprintToggleActive(): Boolean {
-    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled &&
+    return !isScreenOpen() && PolySprintConfig.isEnabled &&
             isToggleSprintEnabled && PolySprintConfig.toggleSprintState
 }
 
@@ -95,7 +94,7 @@ fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
         return true
     }
 
-    return !HudManager.isGuiScreenOpen && PolySprintConfig.isEnabled &&
+    return !isScreenOpen() && PolySprintConfig.isEnabled &&
         isToggleSneakEnabled && PolySprintConfig.toggleSneakState
 }
 
@@ -124,7 +123,7 @@ fun isFlyBoosting(): Boolean {
     return PolySprintClient.isKeyPhysicallyDown(Minecraft.getInstance().options.keySprint)
 }
 
-private fun isScreenOpen(): Boolean {
+internal fun isScreenOpen(): Boolean {
     //? if >=26.2 {
     return Minecraft.getInstance().gui.screen() != null
     //?} else {
