@@ -2,7 +2,6 @@
     "required": true,
     "compatibilityLevel": "JAVA_21",
     "package": "org.polyfrost.polysprint.mixins",
-    "verbose": true,
     "injectors": {
         "defaultRequire": 1
     },
