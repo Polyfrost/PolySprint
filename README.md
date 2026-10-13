@@ -12,11 +12,15 @@ PolySprint is a toggle sprint and toggle sneak mod, with a HUD that tells you wh
 - "Fly Boost" speeds up creative flight while you hold sprint (singleplayer only)
 - On modern versions, the toggles stay in sync with the Sprint and Sneak options in Minecraft's Controls menu
 
+![Settings](.github/images/settings.gif)
+
 ### HUD
 
 The HUD shows a line like `[Sprinting (toggled)]`, and tells you whether you are holding the key, toggled it, or the game started it for you. It covers flying and riding too. Every text can be changed, and you move and scale it in the OneConfig HUD editor.
 
-![State HUD](https://i.imgur.com/RsBcnpT.png)
+![State HUD](.github/images/hud.gif)
+
+![HUD texts](.github/images/hud-texts.gif)
 
 You can use `/polysprint` to open your settings.
 
