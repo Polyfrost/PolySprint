@@ -1,30 +1,37 @@
 # PolySprint
-![Compact Powered by OneConfig](https://polyfrost.org/img/compact_vector.svg)
-![Dev Workflow Status](https://img.shields.io/github/v/release/Polyfrost/PolySprint.svg?style=for-the-badge&color=1452cc&label=release)
 
-A simple yet incredibly functional toggle-sprint mod with a wide array of different features and customization
+[![Modrinth downloads](https://img.shields.io/modrinth/dt/i9xRThb3?style=flat&logo=modrinth&label=Modrinth&color=1bd96a)](https://modrinth.com/mod/polysprint)
+[![CurseForge downloads](https://img.shields.io/curseforge/dt/1147262?style=flat&logo=curseforge&label=CurseForge&color=f16436)](https://www.curseforge.com/minecraft/mc-mods/polysprint)
 
-**Features**
-- Toggle sprint & sneak
-- Extensive HUD customization
-- Disable W-tap sprint
-- Keybinds
-- Native OneConfig support
+PolySprint is a toggle sprint and toggle sneak mod, with a HUD that tells you which state you're in.
 
-## HUD support
-<table>
-  <tr>
-    <th><img src=https://i.imgur.com/kYlQAGQ.png></th>
-    <th><img src=https://i.imgur.com/RsBcnpT.png></th>
-  </tr>
-</table>
+- Toggle sprint and sneak with a single press, and keep the toggle after a restart
+- Bind separate toggle keys, so the normal keys still work for holding
+- Turn off double-tap W sprinting
+- Stop sneaking automatically when you start flying
+- "Fly Boost" speeds up creative flight while you hold sprint (singleplayer only)
+- On modern versions, the toggles stay in sync with the Sprint and Sneak options in Minecraft's Controls menu
 
-![Sprint options](https://i.imgur.com/r8y0LAH.png)
+![Settings](.github/images/settings.gif)
 
-## Keybinds
-![Keybind options](https://i.imgur.com/KADARz2.png)
+### HUD
 
-## Links and support
-* Did you run into a bug? [Open a bug report](https://polyfrost.org/discord)
-* Service interruptions? [Checkout Polyfrost Status](https://status.polyfrost.org/)
-* Feeling social? [Join our discord community](https://polyfrost.org/discord)
+The HUD shows a line like `[Sprinting (toggled)]`, and tells you whether you are holding the key, toggled it, or the game started it for you. It covers flying and riding too. Every text can be changed, and you move and scale it in the OneConfig HUD editor.
+
+![State HUD](.github/images/hud.gif)
+
+![HUD texts](.github/images/hud-texts.gif)
+
+You can use `/polysprint` to open your settings.
+
+## Supported versions
+
+- Minecraft 1.8.9 on Ornithe.
+- Minecraft 1.21.1-26.3 on Fabric.
+
+PolySprint needs [OneConfig](https://modrinth.com/mod/oneconfig) and Fabric Language Kotlin. The Fabric builds also need Fabric API.
+
+## Support
+
+- Report bugs and ask questions on the [Polyfrost Discord](https://polyfrost.org/discord).
+- Check [Polyfrost Status](https://status.polyfrost.org/) if a Polyfrost service is down.
