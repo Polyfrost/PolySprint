@@ -36,7 +36,7 @@ public abstract class Mixin_SprintEvent {
     // tick reads isDown for forward back left right jump then sneak so ordinal 5 is the sneak read
     @WrapOperation(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;isDown()Z", ordinal = 5))
     private boolean polysprint$setSneakState(KeyMapping instance, Operation<Boolean> original) {
-        boolean state = SprintState.isSneakingToggled(instance);
+        boolean state = SprintState.isSneakingToggled(instance, original.call(instance));
         if (state != polysprint$sneaking) {
             polysprint$sneaking = state;
             SprintStateEvent.Type type = SprintStateEvent.Type.SNEAK;

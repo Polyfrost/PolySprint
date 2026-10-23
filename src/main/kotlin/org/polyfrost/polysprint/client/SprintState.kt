@@ -82,13 +82,16 @@ fun restoreToggleKeyStates() {
     }
 }
 
-fun isSneakingToggled(keyBinding: KeyMapping): Boolean {
-    // Vanilla sticky toggleCrouch stays on so KeyMapping#isDown reports the toggle and not the press
-    // Poll the physical key to keep the vanilla sneak key hold-to-sneak
+fun isSneakingToggled(keyBinding: KeyMapping, wrapped: Boolean): Boolean {
+    val raw = keyBinding.isDown
+    if (wrapped != raw) {
+        return wrapped
+    }
+
     val held = if (PolySprintConfig.keybindToggleSneak) {
         !isScreenOpen() && PolySprintClient.isKeyPhysicallyDown(keyBinding)
     } else {
-        keyBinding.isDown
+        raw
     }
     if (held) {
         return true
