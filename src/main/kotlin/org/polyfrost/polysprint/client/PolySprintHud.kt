@@ -19,7 +19,6 @@
 package org.polyfrost.polysprint.client
 
 import net.minecraft.client.Minecraft
-import org.polyfrost.oneconfig.api.config.v1.annotations.Button
 import org.polyfrost.oneconfig.api.config.v1.annotations.Include
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 import org.polyfrost.oneconfig.api.event.v1.eventHandler
@@ -44,25 +43,6 @@ class PolySprintHud : TextHud(
 
     init {
         brackets = true
-    }
-
-    @Button(
-        title = "Reset Text on ALL HUDs",
-        text = "Reset"
-    )
-    fun resetText() {
-        descendingHeld = "Descending (key held)"
-        descendingToggled = "Descending (toggled)"
-        descending = "Descending (vanilla)"
-        flying = "Flying"
-        flyBoostText = "x boost"
-        riding = "Riding"
-        sneakHeld = "Sneaking (key held)"
-        sneakToggle = "Sneaking (toggled)"
-        sneak = "Sneaking (vanilla)"
-        sprintHeld = "Sprinting (key held)"
-        sprintToggle = "Sprinting (toggled)"
-        sprint = "Sprinting (vanilla)"
     }
 
     @Text(
