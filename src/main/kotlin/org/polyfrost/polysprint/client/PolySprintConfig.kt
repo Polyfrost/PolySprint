@@ -152,7 +152,10 @@ object PolySprintConfig : Config(
 
         addCallback("keybindToggleSprintKey") { refreshSprintKeybind() }
         addCallback("keybindToggleSneakKey") { refreshSneakKeybind() }
-        // Disk values are loaded by the addDependency calls above so register the saved keys once here
+    }
+
+    override fun initialize(byConfigManager: Boolean) {
+        super.initialize(byConfigManager)
         refreshSprintKeybind()
         refreshSneakKeybind()
     }
