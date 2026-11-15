@@ -34,8 +34,7 @@ import org.polyfrost.oneconfig.utils.v1.dsl.createScreen
 import org.polyfrost.polysprint.PolySprintConstants
 import org.polyfrost.polysprint.client.isFlyBoostEnabled
 //? if = 1.8.9 {
-/*import org.polyfrost.oneconfig.internal.legacy.KeyCodes
-import org.lwjgl.input.Keyboard
+/*import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 *///?}
 
